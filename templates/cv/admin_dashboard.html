@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Espace Administration — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section admin-dashboard-section">
+  <div class="wrap">
+    
+    <!-- En-tête du Dashboard -->
+    <div class="admin-header">
+      <div>
+        <span class="eyebrow">Administration du site</span>
+        <h2>Tableau de bord</h2>
+        <p class="lede">Gérez facilement vos événements, tribunes, actualités et messages.</p>
+      </div>
+      <div class="admin-header__actions">
+        <a href="{% url 'admin_article_creer' %}" class="btn btn--gold">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nouvel événement / publication
+        </a>
+        <a href="{% url 'deconnexion_admin' %}" class="btn btn--outline-dark btn--sm">Déconnexion</a>
+      </div>
+    </div>
+
+    {% for message in messages %}
+      <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Cartes Statistiques -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <span class="admin-stat-card__label">Total Publications</span>
+        <span class="admin-stat-card__valeur">{{ nb_total }}</span>
+      </div>
+      <div class="admin-stat-card admin-stat-card--success">
+        <span class="admin-stat-card__label">Publiées en ligne</span>
+        <span class="admin-stat-card__valeur">{{ nb_publies }}</span>
+      </div>
+      <div class="admin-stat-card admin-stat-card--warning">
+        <span class="admin-stat-card__label">Brouillons en cours</span>
+        <span class="admin-stat-card__valeur">{{ nb_brouillons }}</span>
+      </div>
+      <div class="admin-stat-card">
+        <span class="admin-stat-card__label">Messages reçus</span>
+        <span class="admin-stat-card__valeur">{{ nb_messages }}</span>
+      </div>
+    </div>
+
+    <!-- Table des Publications / Événements -->
+    <div class="admin-panel">
+      <div class="admin-panel__header">
+        <h3>Toutes les publications & événements ({{ nb_total }})</h3>
+        <a href="{% url 'admin_article_creer' %}" class="btn btn--dark btn--sm">+ Ajouter</a>
+      </div>
+
+      {% if articles %}
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Titre & Rubrique</th>
+                <th>Statut</th>
+                <th>Mise à la une</th>
+                <th>Date de parution</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in articles %}
+                <tr>
+                  <td>
+                    <div class="admin-item-title">
+                      <strong>{{ item.titre }}</strong>
+                      {% if item.rubrique %}
+                        <span class="badge badge--rubrique">{{ item.rubrique.nom }}</span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if item.statut == 'publie' %}
+                      <span class="badge badge--success">Publié</span>
+                    {% else %}
+                      <span class="badge badge--warning">Brouillon</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if item.a_la_une %}
+                      <span class="badge badge--gold">★ À la une</span>
+                    {% else %}
+                      <span class="text-muted">—</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="admin-date">{{ item.publie_le|date:"d F Y à H:i" }}</span>
+                  </td>
+                  <td class="text-right">
+                    <div class="admin-actions">
+                      {% if item.est_visible %}
+                        <a href="{{ item.get_absolute_url }}" target="_blank" class="btn-icon" title="Voir sur le site">
+                          👁️
+                        </a>
+                      {% endif %}
+                      <a href="{% url 'admin_article_modifier' item.pk %}" class="btn-action btn-action--edit">
+                        Modifier
+                      </a>
+                      <form method="post" action="{% url 'admin_article_supprimer' item.pk %}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûre de vouloir supprimer cette publication ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="admin-empty-state">
+          <p>Aucune publication pour le moment.</p>
+          <a href="{% url 'admin_article_creer' %}" class="btn btn--gold">Créer la première publication</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Section Messages du formulaire de contact -->
+    {% if messages_recus %}
+      <div class="admin-panel admin-panel--secondary">
+        <div class="admin-panel__header">
+          <h3>Derniers messages reçus ({{ nb_messages }})</h3>
+        </div>
+        <div class="admin-messages-list">
+          {% for msg in messages_recus %}
+            <div class="admin-message-card">
+              <div class="admin-message-card__head">
+                <strong>{{ msg.nom }}</strong>
+                {% if msg.organisation %}<span class="text-muted">({{ msg.organisation }})</span>{% endif %}
+                <span class="admin-date">{{ msg.envoye_le|date:"d/m/Y à H:i" }}</span>
+              </div>
+              <div class="admin-message-card__email">
+                <a href="mailto:{{ msg.email }}">{{ msg.email }}</a> — <em>Objet : {{ msg.objet }}</em>
+              </div>
+              <p class="admin-message-card__body">{{ msg.contenu }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

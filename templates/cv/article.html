@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.titre }} — {{ profil.nom }}{% endblock %}
+{% block description %}{{ article.chapo|striptags|truncatewords:30 }}{% endblock %}
+
+{% block contenu %}
+
+<article class="section">
+  <div class="wrap">
+
+    {% if not article.est_visible %}
+      <div class="alerte">Cet article est en <strong>brouillon</strong> : vous seule
+        pouvez le voir. Passez son statut à « Publié » depuis l'administration.</div>
+    {% endif %}
+
+    <header class="article__tete">
+      <p class="meta">
+        {% if article.rubrique %}
+          <a href="?rubrique={{ article.rubrique.slug }}">{{ article.rubrique.nom }}</a> ·
+        {% endif %}
+        {{ article.publie_le|date:"j F Y" }} · {{ article.temps_lecture }} min de lecture
+      </p>
+      <h1>{{ article.titre }}</h1>
+      {% if article.chapo %}<p class="article__chapo">{{ article.chapo }}</p>{% endif %}
+    </header>
+
+    {% if article.image_src %}
+      <figure class="article__figure">
+        <img src="{{ article.image_src }}" alt="{{ article.image_legende|default:article.titre }}">
+        {% if article.image_legende %}
+          <figcaption>{{ article.image_legende }}</figcaption>
+        {% endif %}
+      </figure>
+    {% endif %}
+
+    <div class="prose">
+      {{ article.contenu_html }}
+    </div>
+
+    <footer class="article__pied">
+      <p>{{ profil.nom }} — {{ profil.titre }}</p>
+      <a class="btn btn--dark" href="{% url 'publications' %}">Toutes les publications</a>
+    </footer>
+  </div>
+</article>
+
+{% if autres %}
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="section__head"><h2>À lire également</h2></div>
+    <div class="grid-cards">
+      {% for autre in autres %}
+        <a class="card card--article" href="{{ autre.get_absolute_url }}">
+          <div class="card__corps">
+            <p class="meta">{{ autre.publie_le|date:"j F Y" }}</p>
+            <h3>{{ autre.titre }}</h3>
+            {% if autre.chapo %}<p>{{ autre.chapo|truncatewords:18 }}</p>{% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

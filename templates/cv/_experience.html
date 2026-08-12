@@ -1,0 +1,38 @@
+{% comment %}
+Une fiche du parcours. Partagée par l'accueil et la page Parcours pour que les
+deux ne puissent pas diverger. Attend `experience`.
+{% endcomment %}
+<li class="parcours__item {% if experience.en_cours %}parcours__item--actuel{% endif %}">
+  <div class="parcours__pastille" aria-hidden="true">
+    <span>{{ experience.annee_debut }}</span>
+  </div>
+
+  <article class="parcours__carte">
+    <div class="parcours__corps">
+      {% if experience.en_cours %}
+        <span class="badge-actuel">Fonction actuelle</span>
+      {% endif %}
+      <h3 class="parcours__poste">{{ experience.poste }}</h3>
+      <p class="parcours__org">
+        {{ experience.organisation }}{% if experience.lieu %} <span>·</span> {{ experience.lieu }}{% endif %}
+      </p>
+      <p class="parcours__periode">{{ experience.periode }}</p>
+
+      {% if experience.missions %}
+        <ul class="parcours__missions">
+          {% for mission in experience.missions %}<li>{{ mission }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {% if experience.photo %}
+      <figure class="parcours__figure">
+        <img src="{{ experience.photo.url }}" alt="{{ experience.photo_legende|default:experience.poste }}"
+             loading="lazy">
+        {% if experience.photo_legende %}
+          <figcaption>{{ experience.photo_legende }}</figcaption>
+        {% endif %}
+      </figure>
+    {% endif %}
+  </article>
+</li>

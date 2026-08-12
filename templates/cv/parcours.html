@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Parcours — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Parcours</p>
+      <h2>Expériences professionnelles</h2>
+      <p class="lede">De la souscription en assurance IARD à la direction d'un régime
+        national d'assurance maladie, puis à la responsabilité gouvernementale et
+        parlementaire.</p>
+    </div>
+    <ol class="parcours">
+      {% for experience in experiences %}
+        {% include "cv/_experience.html" %}
+      {% empty %}
+        <li><p class="lede">Contenu à venir.</p></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+{% if formations %}
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Cursus</p>
+      <h2>Formations et diplômes</h2>
+    </div>
+    <ul class="liste-formations">
+      {% for formation in formations %}
+        <li>
+          <span class="annee">{{ formation.annee }}</span>
+          <span class="intitule">
+            {{ formation.intitule }}{% if formation.mention %} — <em>{{ formation.mention }}</em>{% endif %}
+            {% if formation.etablissement %}<span class="etablissement">{{ formation.etablissement }}</span>{% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

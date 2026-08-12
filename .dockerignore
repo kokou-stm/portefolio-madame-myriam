@@ -1,0 +1,18 @@
+# Le CV source ne doit jamais entrer dans l'image (adresse et téléphones perso).
+*.docx
+*.doc
+*.pdf
+
+.venv/
+__pycache__/
+*.py[cod]
+db.sqlite3
+media/
+staticfiles/
+.git/
+.gitignore
+.DS_Store
+.dockerignore
+.deployignore
+deploy.zip
+Dockerfile

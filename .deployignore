@@ -1,0 +1,17 @@
+# Fichiers exclus du paquet envoyé à Azure.
+# Le CV source ne doit jamais quitter le poste : il contient l'adresse du
+# domicile et les téléphones personnels, absents du site publié.
+*.docx
+*.doc
+*.pdf
+
+.venv/
+__pycache__/
+*.py[cod]
+db.sqlite3
+media/
+staticfiles/
+.git/
+.DS_Store
+.deployignore
+deploy.zip

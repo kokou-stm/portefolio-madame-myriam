@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Engagements — {{ profil.nom }}{% endblock %}
+{% block description %}Distinctions, mandats et engagements de {{ profil.nom }}.{% endblock %}
+
+{% block contenu %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Engagements</p>
+      <h2>Distinctions, mandats<br>et engagements</h2>
+      <p class="lede">Reconnaissances reçues, responsabilités associatives et
+        institutionnelles portées au fil du parcours.</p>
+    </div>
+    <div class="grid-cards grid-cards--engagements">
+      {% for distinction in distinctions %}
+        <article class="card card--engagement">
+          {% if distinction.photo_src %}
+            <figure class="card__figure">
+              <img src="{{ distinction.photo_src }}"
+                   alt="{{ distinction.photo_legende|default:distinction.intitule }}" loading="lazy">
+              {% if distinction.photo_legende or distinction.photo_credit %}
+                <figcaption>
+                  {% if distinction.photo_legende %}<span class="card__legende">{{ distinction.photo_legende }}</span>{% endif %}
+                  {% if distinction.photo_credit %}<span class="card__credit">© {{ distinction.photo_credit }}</span>{% endif %}
+                </figcaption>
+              {% endif %}
+            </figure>
+          {% endif %}
+
+          <div class="card__corps">
+            {% if distinction.annee %}<p class="meta">{{ distinction.annee }}</p>{% endif %}
+            <h3>{{ distinction.intitule }}</h3>
+            {% if distinction.detail %}<p>{{ distinction.detail }}</p>{% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <p class="lede">Contenu à venir.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

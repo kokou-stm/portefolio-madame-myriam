@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ profil.nom }} — {{ profil.titre }}{% endblock %}
+
+{% block contenu %}
+
+<section class="hero" style="--fond: url('{% if profil.image_fond %}{{ profil.image_fond.url }}{% else %}{% static 'img/assemblee-nationale.jpg' %}{% endif %}')">
+  <div class="hero__fond" aria-hidden="true"></div>
+  <div class="wrap hero__inner">
+    <div class="hero__photo">
+      {% if profil.photo %}
+        <img src="{{ profil.photo.url }}" alt="Portrait de {{ profil.nom }}">
+      {% else %}
+        <img src="{% static 'img/myriam-dossou-medaillon.png' %}" alt="Portrait de {{ profil.nom }}">
+      {% endif %}
+    </div>
+    <div class="hero__text">
+      <p class="eyebrow">
+        <img class="hero__embleme" src="{% static 'img/armoiries-togo.png' %}"
+             alt="Armoiries de la République togolaise" width="78" height="112">
+        {{ profil.localisation }}
+      </p>
+      <h1>{{ profil.nom }}</h1>
+      <p class="hero__role">{{ profil.sous_titre }}</p>
+      <p class="hero__accroche">{{ profil.accroche }}</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="{% url 'parcours' %}">Découvrir le parcours</a>
+        <a class="btn btn--ghost" href="{% url 'contact' %}">Prendre contact</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if chiffres %}
+<section class="section section--chiffres">
+  <div class="wrap">
+    <div class="chiffres">
+      {% for chiffre in chiffres %}
+        <div class="chiffre">
+          <div class="chiffre__valeur">{{ chiffre.valeur }}</div>
+          <div class="chiffre__libelle">{{ chiffre.libelle }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="bio">
+      <div>
+        <p class="eyebrow">Présentation</p>
+        <h2>Trente ans au service de<br>l'assurance et du social</h2>
+      </div>
+      <div class="bio__texte">
+        {{ profil.biographie|truncatewords:90|linebreaks }}
+        <p style="margin-top:1.5rem">
+          <a class="btn btn--dark" href="{% url 'biographie' %}">Lire la biographie</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if competences %}
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Expertise</p>
+      <h2>Domaines d'intervention</h2>
+      <p class="lede">Une double compétence technique et institutionnelle, construite
+        entre le secteur de l'assurance privée et la conduite de politiques publiques.</p>
+    </div>
+    <div class="competences">
+      {% for competence in competences %}
+        <article class="competence">
+          <div class="competence__pastille">
+            {% include "cv/_icone.html" with nom=competence.icone %}
+          </div>
+          <h3>{{ competence.intitule }}</h3>
+          {% if competence.description %}<p>{{ competence.description }}</p>{% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if experiences %}
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Fonctions récentes</p>
+      <h2>Responsabilités exercées</h2>
+    </div>
+    <ol class="parcours">
+      {% for experience in experiences %}
+        {% include "cv/_experience.html" %}
+      {% endfor %}
+    </ol>
+    <p style="margin-top:2.5rem">
+      <a class="btn btn--dark" href="{% url 'parcours' %}">Voir le parcours complet</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{% if articles %}
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Actualités</p>
+      <h2>Dernières prises de parole</h2>
+    </div>
+    <div class="grid-cards">
+      {% for article in articles %}
+        <a class="card card--article" href="{{ article.get_absolute_url }}">
+          {% if article.image %}
+            <div class="card__image"><img src="{{ article.image.url }}" alt=""></div>
+          {% endif %}
+          <div class="card__corps">
+            <p class="meta">
+              {% if article.rubrique %}{{ article.rubrique.nom }} · {% endif %}
+              {{ article.publie_le|date:"j F Y" }}
+            </p>
+            <h3>{{ article.titre }}</h3>
+            {% if article.chapo %}<p>{{ article.chapo|truncatewords:20 }}</p>{% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    <p style="margin-top:2.5rem">
+      <a class="btn btn--dark" href="{% url 'publications' %}">Toutes les actualités</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

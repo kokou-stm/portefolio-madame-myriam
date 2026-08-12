@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Réalisations et engagements — {{ profil.nom }}{% endblock %}
+{% block description %}Actions menées par {{ profil.nom }} en matière de protection sociale, de jeunesse et de développement des territoires au Togo.{% endblock %}
+
+{% block contenu %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Réalisations et engagements</p>
+      <h2>Des politiques menées,<br>des résultats mesurables</h2>
+      <p class="lede">De la couverture maladie à l'insertion des jeunes, un aperçu
+        des chantiers conduits au sein de l'exécutif, de l'Institut National
+        d'Assurance Maladie et de l'Assemblée nationale.</p>
+    </div>
+
+    {% if domaines %}
+      <nav class="filtres">
+        <a href="{% url 'realisations' %}" {% if not domaine_actif %}class="actif"{% endif %}>Tous les domaines</a>
+        {% for cle, libelle in domaines %}
+          <a href="?domaine={{ cle }}" {% if domaine_actif == cle %}class="actif"{% endif %}>{{ libelle }}</a>
+        {% endfor %}
+      </nav>
+    {% endif %}
+
+    <div class="realisations">
+      {% for realisation in realisations %}
+        <article class="realisation">
+          {% if realisation.photo_src %}
+            <figure class="realisation__figure">
+              <img src="{{ realisation.photo_src }}"
+                   alt="{{ realisation.photo_legende|default:realisation.titre }}" loading="lazy">
+              {% if realisation.photo_legende or realisation.photo_credit %}
+                <figcaption>
+                  {% if realisation.photo_legende %}{{ realisation.photo_legende }}{% endif %}
+                  {% if realisation.photo_credit %}<span class="realisation__credit">© {{ realisation.photo_credit }}</span>{% endif %}
+                </figcaption>
+              {% endif %}
+            </figure>
+          {% endif %}
+
+          <div class="realisation__corps">
+            <p class="meta">{{ realisation.annee }} · {{ realisation.get_domaine_display }}</p>
+            <h3>{{ realisation.titre }}</h3>
+
+            {% if realisation.chiffre %}
+              <p class="realisation__chiffre">
+                <strong>{{ realisation.chiffre }}</strong>
+                {% if realisation.chiffre_libelle %}<span>{{ realisation.chiffre_libelle }}</span>{% endif %}
+              </p>
+            {% endif %}
+
+            <p class="realisation__texte">{{ realisation.description }}</p>
+
+            <a class="realisation__source" href="{{ realisation.source_url }}"
+               target="_blank" rel="noopener noreferrer">
+              Source : {{ realisation.source_nom }}
+            </a>
+          </div>
+        </article>
+      {% empty %}
+        <p class="lede">Contenu à venir.</p>
+      {% endfor %}
+    </div>
+
+    <p class="note-sources">
+      Chaque réalisation renvoie à la publication de presse ou à la page
+      officielle qui l'atteste.
+    </p>
+  </div>
+</section>
+
+{% endblock %}

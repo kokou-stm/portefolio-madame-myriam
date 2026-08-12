@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Publications — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Publications</p>
+      <h2>Tribunes et actualités</h2>
+      <p class="lede">Prises de position, comptes rendus de mission et réflexions sur
+        la protection sociale, le développement à la base et la jeunesse.</p>
+    </div>
+
+    {% if rubriques %}
+      <nav class="filtres">
+        <a href="{% url 'publications' %}" {% if not rubrique_active %}class="actif"{% endif %}>Toutes</a>
+        {% for rubrique in rubriques %}
+          <a href="?rubrique={{ rubrique.slug }}"
+             {% if rubrique_active == rubrique %}class="actif"{% endif %}>{{ rubrique.nom }}</a>
+        {% endfor %}
+      </nav>
+    {% endif %}
+
+    {% if une %}
+      <a class="une {% if not une.image_src %}une--sans-image{% endif %}" href="{{ une.get_absolute_url }}">
+        {% if une.image_src %}
+          <div class="une__image"><img src="{{ une.image_src }}" alt="{{ une.image_legende|default:une.titre }}"></div>
+        {% endif %}
+        <div class="une__texte">
+          <p class="meta">
+            {% if une.rubrique %}{{ une.rubrique.nom }} · {% endif %}
+            {{ une.publie_le|date:"j F Y" }}
+          </p>
+          <h3>{{ une.titre }}</h3>
+          {% if une.chapo %}<p>{{ une.chapo }}</p>{% endif %}
+          <span class="lien-fleche">Lire l'article</span>
+        </div>
+      </a>
+    {% endif %}
+
+    <div class="grid-cards">
+      {% for article in page %}
+        <a class="card card--article" href="{{ article.get_absolute_url }}">
+          {% if article.image_src %}
+            <div class="card__image"><img src="{{ article.image_src }}" alt="{{ article.image_legende|default:article.titre }}"></div>
+          {% endif %}
+          <div class="card__corps">
+            <p class="meta">
+              {% if article.rubrique %}{{ article.rubrique.nom }} · {% endif %}
+              {{ article.publie_le|date:"j F Y" }}
+            </p>
+            <h3>{{ article.titre }}</h3>
+            {% if article.chapo %}<p>{{ article.chapo|truncatewords:24 }}</p>{% endif %}
+          </div>
+        </a>
+      {% empty %}
+        {% if not une %}
+          <p class="lede">Aucune publication pour le moment.</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if page.has_other_pages %}
+      <nav class="pagination">
+        {% if page.has_previous %}
+          <a href="?page={{ page.previous_page_number }}{% if rubrique_active %}&rubrique={{ rubrique_active.slug }}{% endif %}">← Précédent</a>
+        {% endif %}
+        <span>Page {{ page.number }} sur {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}
+          <a href="?page={{ page.next_page_number }}{% if rubrique_active %}&rubrique={{ rubrique_active.slug }}{% endif %}">Suivant →</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titre_page }} — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section admin-form-section">
+  <div class="wrap wrap--narrow">
+    
+    <div class="admin-form-header">
+      <a href="{% url 'admin_dashboard' %}" class="btn-back">
+        ← Retour au tableau de bord
+      </a>
+      <h2>{{ titre_page }}</h2>
+      <p class="lede">Rédigez ou mettez à jour la publication. Les événements et articles publiés apparaîtront directement dans la rubrique Actualités du site.</p>
+    </div>
+
+    {% for message in messages %}
+      <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post" enctype="multipart/form-data" class="form form--admin-editor" novalidate>
+      {% csrf_token %}
+
+      <div class="form__field">
+        <label for="{{ form.titre.id_for_label }}">{{ form.titre.label }} <span class="req">*</span></label>
+        {{ form.titre }}
+        {% for erreur in form.titre.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+      </div>
+
+      <div class="form__row">
+        <div class="form__field">
+          <label for="{{ form.rubrique.id_for_label }}">{{ form.rubrique.label }}</label>
+          {{ form.rubrique }}
+          {% for erreur in form.rubrique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <div class="form__field">
+          <label for="{{ form.nouvelle_rubrique.id_for_label }}">{{ form.nouvelle_rubrique.label }}</label>
+          {{ form.nouvelle_rubrique }}
+          {% for erreur in form.nouvelle_rubrique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <div class="form__field">
+          <label for="{{ form.statut.id_for_label }}">{{ form.statut.label }} <span class="req">*</span></label>
+          {{ form.statut }}
+          {% for erreur in form.statut.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="form__row">
+        <div class="form__field">
+          <label for="{{ form.publie_le.id_for_label }}">{{ form.publie_le.label }}</label>
+          {{ form.publie_le }}
+          {% for erreur in form.publie_le.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <div class="form__field form__field--checkbox">
+          <label for="{{ form.a_la_une.id_for_label }}" class="checkbox-label">
+            {{ form.a_la_une }}
+            <strong>{{ form.a_la_une.label }}</strong>
+          </label>
+          <span class="form-help">Affiche cette publication en premier dans la liste.</span>
+        </div>
+      </div>
+
+      <div class="form__field">
+        <label for="{{ form.chapo.id_for_label }}">{{ form.chapo.label }}</label>
+        {{ form.chapo }}
+        <span class="form-help">Résumé en 2 ou 3 lignes pour accrocher le lecteur.</span>
+        {% for erreur in form.chapo.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+      </div>
+
+      <div class="form__field">
+        <label for="{{ form.contenu.id_for_label }}">{{ form.contenu.label }} <span class="req">*</span></label>
+        {{ form.contenu }}
+        <span class="form-help">Vous pouvez utiliser du Markdown simple pour la mise en forme (**gras**, *italique*, ## Titre de section).</span>
+        {% for erreur in form.contenu.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+      </div>
+
+      <div class="admin-image-upload-box">
+        <h4>Illustration d'en-tête</h4>
+        {% if article and article.image %}
+          <div class="admin-current-image">
+            <img src="{{ article.image.url }}" alt="Aperçu de l'image actuelle" style="max-height: 140px; border-radius: 6px;">
+            <p class="text-muted">Image actuelle</p>
+          </div>
+        {% endif %}
+        
+        <div class="form__field">
+          <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+          {{ form.image }}
+          {% for erreur in form.image.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <div class="form__field">
+          <label for="{{ form.image_legende.id_for_label }}">{{ form.image_legende.label }}</label>
+          {{ form.image_legende }}
+          {% for erreur in form.image_legende.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn--gold btn--lg">{{ bouton_action }}</button>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn--outline-dark">Annuler</a>
+      </div>
+
+    </form>
+  </div>
+</section>
+{% endblock %}

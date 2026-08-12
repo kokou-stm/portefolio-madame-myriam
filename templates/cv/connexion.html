@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion Administrateur — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section section--dark admin-login-section">
+  <div class="wrap wrap--narrow">
+    <div class="admin-login-card">
+      <div class="admin-login-card__header">
+        <span class="eyebrow eyebrow--gold">Espace d'Administration</span>
+        <h2>Connexion</h2>
+        <p class="lede">Espace réservé à la rédaction et la gestion des événements et publications de {{ profil.nom }}.</p>
+      </div>
+
+      {% for message in messages %}
+        <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+
+      <form method="post" class="form form--admin" novalidate>
+        {% csrf_token %}
+        <div class="form__field">
+          <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+          {{ form.username }}
+          {% for erreur in form.username.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <div class="form__field">
+          <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+          {{ form.password }}
+          {% for erreur in form.password.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn--gold btn--full">Se connecter à l'espace admin</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,83 @@
+name: Deploy Portfolio to Azure ACI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build & Push Image to Azure Container Registry
+        run: |
+          IMAGE_TAG="${{ github.sha }}"
+          echo "Building image portfolio:${IMAGE_TAG} and tagging as latest..."
+          az acr build --registry acrmyriam655aec --image portfolio:${IMAGE_TAG} --image portfolio:latest .
+
+      - name: Deploy to Azure Container Instances (ACI)
+        run: |
+          IMAGE_TAG="${{ github.sha }}"
+          RESOURCE_GROUP="rg-portfolio-myriam"
+          CONTAINER_NAME="aci-portfolio-myriam"
+          ACR_NAME="acrmyriam655aec"
+          STORAGE_ACCOUNT="stmyriam655aec"
+          SHARE_NAME="portfolio-data"
+
+          echo "--> Retrieving credentials..."
+          ST_KEY=$(az storage account keys list -g "$RESOURCE_GROUP" -n "$STORAGE_ACCOUNT" --query "[0].value" -o tsv)
+          ACR_PASS=$(az acr credential show -n "$ACR_NAME" --query "passwords[0].value" -o tsv)
+
+          echo "--> Removing old container..."
+          az container delete -g "$RESOURCE_GROUP" -n "$CONTAINER_NAME" --yes || true
+
+          echo "--> Creating container with image portfolio:${IMAGE_TAG}..."
+          az container create \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$CONTAINER_NAME" \
+            --location francecentral \
+            --os-type Linux \
+            --image "${ACR_NAME}.azurecr.io/portfolio:${IMAGE_TAG}" \
+            --registry-login-server "${ACR_NAME}.azurecr.io" \
+            --registry-username "$ACR_NAME" \
+            --registry-password "$ACR_PASS" \
+            --dns-name-label myriam-dossou \
+            --ports 80 \
+            --cpu 1 --memory 1.5 \
+            --azure-file-volume-account-name "$STORAGE_ACCOUNT" \
+            --azure-file-volume-account-key "$ST_KEY" \
+            --azure-file-volume-share-name "$SHARE_NAME" \
+            --azure-file-volume-mount-path /home/data \
+            --environment-variables \
+              PORT=80 \
+              DJANGO_DEBUG=0 \
+              DJANGO_HTTPS=0 \
+              DJANGO_ALLOWED_HOSTS="myriam-dossou.francecentral.azurecontainer.io,myriamdossou.com,www.myriamdossou.com,*" \
+              DJANGO_CSRF_TRUSTED_ORIGINS="https://myriamdossou.com,https://www.myriamdossou.com,http://myriamdossou.com,http://www.myriamdossou.com,http://myriam-dossou.francecentral.azurecontainer.io" \
+              DJANGO_DATA_DIR="/home/data" \
+            --secure-environment-variables \
+              DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}"
+
+      - name: Verify Live Deployment
+        run: |
+          echo "Waiting 15 seconds for container startup..."
+          sleep 15
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://myriamdossou.com/)
+          echo "Site HTTP Status Code: $STATUS_CODE"
+          if [ "$STATUS_CODE" -ne 200 ]; then
+            echo "Error: Live website returned status $STATUS_CODE"
+            exit 1
+          fi
+          echo "Deployment verified successfully! Site is live at https://myriamdossou.com/"

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Galerie — {{ profil.nom }}{% endblock %}
+{% block description %}Galerie photo de {{ profil.nom }} : cérémonies, missions de terrain et temps forts.{% endblock %}
+
+{% block contenu %}
+
+{% comment %}
+Sans JavaScript, l'apparition au défilement ne se déclenche pas : on rend
+alors les images directement visibles plutôt que transparentes.
+{% endcomment %}
+<noscript>
+  <style>.galerie__item { opacity: 1; transform: none; }</style>
+</noscript>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Galerie</p>
+      <h2>En images</h2>
+      <p class="lede">Cérémonies, missions de terrain et temps forts de la vie
+        publique et parlementaire.</p>
+    </div>
+
+    <div class="galerie" id="galerie">
+      <figure class="galerie__item galerie__item--video est-visible" style="--i: 0">
+        <div class="galerie__cadre galerie__cadre--video">
+          <video class="reel__media" controls playsinline preload="metadata"
+                 poster="{% static 'img/reel-poster.jpg' %}">
+            <source src="{% static 'videos/reel-myriam.mp4' %}" type="video/mp4">
+            Votre navigateur ne peut pas lire cette vidéo.
+          </video>
+        </div>
+        <figcaption>
+          <span class="galerie__legende">Intervention publique de {{ profil.nom }}</span>
+          <span class="galerie__date">Vidéo</span>
+          <a class="galerie__source" href="https://www.facebook.com/reel/1307475732440191"
+             target="_blank" rel="noopener noreferrer">Voir sur Facebook ↗</a>
+        </figcaption>
+      </figure>
+
+      {% if photos %}
+        {% for photo in photos %}
+          <figure class="galerie__item" style="--i: {{ forloop.counter }}"
+                  role="button" tabindex="0"
+                  data-src="{{ photo.src }}"
+                  data-legende="{{ photo.legende }}"
+                  data-credit="{% if photo.credit_complet %}© {{ photo.credit_complet }}{% endif %}">
+            <div class="galerie__cadre">
+              <img src="{{ photo.src }}" alt="{{ photo.legende|default:'Photo' }}" loading="lazy">
+              <span class="galerie__loupe" aria-hidden="true"></span>
+            </div>
+            {% if photo.legende or photo.date or photo.credit_complet %}
+              <figcaption>
+                {% if photo.legende %}<span class="galerie__legende">{{ photo.legende }}</span>{% endif %}
+                {% if photo.date %}<span class="galerie__date">{{ photo.date }}</span>{% endif %}
+                {% if photo.credit_complet %}<span class="galerie__credit">© {{ photo.credit_complet }}</span>{% endif %}
+              </figcaption>
+            {% endif %}
+          </figure>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {% if photos %}
+      <p class="note-sources">
+        Les photos disponibles sous licence libre sont créditées à leur auteur.
+        Les autres clichés proviennent des archives du cabinet.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% if photos %}
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
+    <button class="lightbox__fermer" type="button" aria-label="Fermer">&times;</button>
+    <figure class="lightbox__figure">
+      <img src="" alt="">
+      <figcaption></figcaption>
+    </figure>
+  </div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+  {% if photos %}<script src="{% static 'js/galerie.js' %}" defer></script>{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Biographie — {{ profil.nom }}{% endblock %}
+{% block description %}Biographie de {{ profil.nom }}, {{ profil.titre }}.{% endblock %}
+
+{% block contenu %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="eyebrow">Biographie</p>
+      <h2>Un parcours au service de<br>l'assurance et du social</h2>
+    </div>
+
+    <div class="bio">
+      <div class="bio__portrait">
+        {% if profil.photo %}
+          <img src="{{ profil.photo.url }}" alt="Portrait de {{ profil.nom }}">
+        {% else %}
+          <img src="{% static 'img/myriam-dossou.png' %}" alt="Portrait de {{ profil.nom }}">
+        {% endif %}
+        <p class="bio__legende">{{ profil.nom }}<br><span>{{ profil.sous_titre }}</span></p>
+      </div>
+      <div class="bio__texte">
+        {% if profil.biographie %}
+          {{ profil.biographie|linebreaks }}
+        {% else %}
+          <p class="lede">Contenu à venir.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if chiffres %}
+<section class="section section--chiffres">
+  <div class="wrap">
+    <div class="chiffres">
+      {% for chiffre in chiffres %}
+        <div class="chiffre">
+          <div class="chiffre__valeur">{{ chiffre.valeur }}</div>
+          <div class="chiffre__libelle">{{ chiffre.libelle }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
