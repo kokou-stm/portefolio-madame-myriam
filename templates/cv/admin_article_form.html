@@ -1,110 +1,286 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}{{ titre_page }} — {{ profil.nom }}{% endblock %}
+{% block title %}{{ titre_page }} — Espace Administration — {{ profil.nom }}{% endblock %}
 
 {% block contenu %}
-<section class="section admin-form-section">
-  <div class="wrap wrap--narrow">
-    
-    <div class="admin-form-header">
-      <a href="{% url 'admin_dashboard' %}" class="btn-back">
-        ← Retour au tableau de bord
-      </a>
-      <h2>{{ titre_page }}</h2>
-      <p class="lede">Rédigez ou mettez à jour la publication. Les événements et articles publiés apparaîtront directement dans la rubrique Actualités du site.</p>
+<section class="section admin-editor-section">
+  <div class="wrap wrap--wide">
+
+    <!-- En-tête de l'éditeur -->
+    <div class="admin-editor-header">
+      <div class="admin-editor-header__meta">
+        <a href="{% url 'admin_dashboard' %}" class="admin-back-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Tableau de bord
+        </a>
+        <div class="admin-editor-header__title-group">
+          <h2>{{ titre_page }}</h2>
+          {% if article %}
+            <span class="admin-badge admin-badge--{{ article.statut }}">
+              {% if article.statut == 'publie' %}● Publié{% else %}○ Brouillon{% endif %}
+            </span>
+          {% else %}
+            <span class="admin-badge admin-badge--new">● Nouvelle publication</span>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
     {% for message in messages %}
       <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 
-    <form method="post" enctype="multipart/form-data" class="form form--admin-editor" novalidate>
+    <form method="post" enctype="multipart/form-data" class="admin-editor-form" novalidate>
       {% csrf_token %}
 
-      <div class="form__field">
-        <label for="{{ form.titre.id_for_label }}">{{ form.titre.label }} <span class="req">*</span></label>
-        {{ form.titre }}
-        {% for erreur in form.titre.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-      </div>
-
-      <div class="form__row">
-        <div class="form__field">
-          <label for="{{ form.rubrique.id_for_label }}">{{ form.rubrique.label }}</label>
-          {{ form.rubrique }}
-          {% for erreur in form.rubrique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-        </div>
-
-        <div class="form__field">
-          <label for="{{ form.nouvelle_rubrique.id_for_label }}">{{ form.nouvelle_rubrique.label }}</label>
-          {{ form.nouvelle_rubrique }}
-          {% for erreur in form.nouvelle_rubrique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-        </div>
-
-        <div class="form__field">
-          <label for="{{ form.statut.id_for_label }}">{{ form.statut.label }} <span class="req">*</span></label>
-          {{ form.statut }}
-          {% for erreur in form.statut.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-        </div>
-      </div>
-
-      <div class="form__row">
-        <div class="form__field">
-          <label for="{{ form.publie_le.id_for_label }}">{{ form.publie_le.label }}</label>
-          {{ form.publie_le }}
-          {% for erreur in form.publie_le.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-        </div>
-
-        <div class="form__field form__field--checkbox">
-          <label for="{{ form.a_la_une.id_for_label }}" class="checkbox-label">
-            {{ form.a_la_une }}
-            <strong>{{ form.a_la_une.label }}</strong>
-          </label>
-          <span class="form-help">Affiche cette publication en premier dans la liste.</span>
-        </div>
-      </div>
-
-      <div class="form__field">
-        <label for="{{ form.chapo.id_for_label }}">{{ form.chapo.label }}</label>
-        {{ form.chapo }}
-        <span class="form-help">Résumé en 2 ou 3 lignes pour accrocher le lecteur.</span>
-        {% for erreur in form.chapo.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-      </div>
-
-      <div class="form__field">
-        <label for="{{ form.contenu.id_for_label }}">{{ form.contenu.label }} <span class="req">*</span></label>
-        {{ form.contenu }}
-        <span class="form-help">Vous pouvez utiliser du Markdown simple pour la mise en forme (**gras**, *italique*, ## Titre de section).</span>
-        {% for erreur in form.contenu.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
-      </div>
-
-      <div class="admin-image-upload-box">
-        <h4>Illustration d'en-tête</h4>
-        {% if article and article.image %}
-          <div class="admin-current-image">
-            <img src="{{ article.image.url }}" alt="Aperçu de l'image actuelle" style="max-height: 140px; border-radius: 6px;">
-            <p class="text-muted">Image actuelle</p>
-          </div>
-        {% endif %}
+      <div class="admin-editor-grid">
         
-        <div class="form__field">
-          <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
-          {{ form.image }}
-          {% for erreur in form.image.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        <!-- Colonne Principale (Contenu & Rédaction) -->
+        <div class="admin-editor-main">
+          
+          <!-- Carte : Informations Générales -->
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h3 class="admin-card__title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Informations Principales
+              </h3>
+            </div>
+            <div class="admin-card__body">
+              <div class="form__field">
+                <label for="{{ form.titre.id_for_label }}" class="form-label">
+                  {{ form.titre.label }} <span class="req">*</span>
+                </label>
+                {{ form.titre }}
+                {% for erreur in form.titre.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+              </div>
+
+              <div class="form__row form__row--3col">
+                <div class="form__field">
+                  <label for="{{ form.rubrique.id_for_label }}" class="form-label">{{ form.rubrique.label }}</label>
+                  {{ form.rubrique }}
+                  {% for erreur in form.rubrique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+                </div>
+
+                <div class="form__field">
+                  <label for="{{ form.nouvelle_rubrique.id_for_label }}" class="form-label">{{ form.nouvelle_rubrique.label }}</label>
+                  {{ form.nouvelle_rubrique }}
+                  {% for erreur in form.nouvelle_rubrique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+                </div>
+
+                <div class="form__field">
+                  <label for="{{ form.statut.id_for_label }}" class="form-label">
+                    {{ form.statut.label }} <span class="req">*</span>
+                  </label>
+                  {{ form.statut }}
+                  {% for erreur in form.statut.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carte : Rédaction du Texte -->
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h3 class="admin-card__title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Rédaction du Texte
+              </h3>
+            </div>
+            <div class="admin-card__body">
+              
+              <!-- Résumé (ex-Chapô) -->
+              <div class="form__field">
+                <div class="form-label-row">
+                  <label for="{{ form.chapo.id_for_label }}" class="form-label">{{ form.chapo.label }}</label>
+                  <span class="form-hint">Accroche pour la liste et les aperçus</span>
+                </div>
+                {{ form.chapo }}
+                {% for erreur in form.chapo.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+              </div>
+
+              <!-- Corps de l'article -->
+              <div class="form__field">
+                <div class="form-label-row">
+                  <label for="{{ form.contenu.id_for_label }}" class="form-label">
+                    {{ form.contenu.label }} <span class="req">*</span>
+                  </label>
+                  <span class="form-stats" id="editor-stats">0 mot • 0 caractère</span>
+                </div>
+
+                <!-- Barre d'outils Markdown -->
+                <div class="markdown-toolbar">
+                  <button type="button" class="toolbar-btn" data-tag="**" title="Gras">
+                    <strong>B</strong>
+                  </button>
+                  <button type="button" class="toolbar-btn" data-tag="*" title="Italique">
+                    <em>I</em>
+                  </button>
+                  <button type="button" class="toolbar-btn" data-prefix="## " title="Titre de section (H2)">
+                    H2
+                  </button>
+                  <button type="button" class="toolbar-btn" data-prefix="### " title="Sous-titre (H3)">
+                    H3
+                  </button>
+                  <button type="button" class="toolbar-btn" data-prefix="> " title="Citation">
+                    « »
+                  </button>
+                  <button type="button" class="toolbar-btn" data-prefix="- " title="Liste à puces">
+                    • Liste
+                  </button>
+                  <button type="button" class="toolbar-btn" data-link="true" title="Lien web">
+                    🔗 Lien
+                  </button>
+                </div>
+
+                {{ form.contenu }}
+                {% for erreur in form.contenu.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
-        <div class="form__field">
-          <label for="{{ form.image_legende.id_for_label }}">{{ form.image_legende.label }}</label>
-          {{ form.image_legende }}
-          {% for erreur in form.image_legende.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+        <!-- Colonne Latérale (Paramètres & Médias) -->
+        <div class="admin-editor-sidebar">
+          
+          <!-- Carte : Options de Parution -->
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h3 class="admin-card__title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Paramètres de Parution
+              </h3>
+            </div>
+            <div class="admin-card__body">
+              
+              <div class="form__field">
+                <label for="{{ form.publie_le.id_for_label }}" class="form-label">{{ form.publie_le.label }}</label>
+                {{ form.publie_le }}
+                <span class="form-help">Une date future programme la publication automatique.</span>
+                {% for erreur in form.publie_le.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+              </div>
+
+              <div class="form__field form__field--toggle">
+                <label for="{{ form.a_la_une.id_for_label }}" class="toggle-control">
+                  {{ form.a_la_une }}
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label">{{ form.a_la_une.label }}</span>
+                </label>
+                <span class="form-help">Épingler cet article en haut de la page Actualités.</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Carte : Visuel d'illustration -->
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h3 class="admin-card__title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                Image d'illustration
+              </h3>
+            </div>
+            <div class="admin-card__body">
+              
+              {% if article and article.image %}
+                <div class="admin-preview-box">
+                  <img src="{{ article.image.url }}" alt="Illustration actuelle" class="admin-preview-img">
+                  <div class="admin-preview-meta">
+                    <span class="badge badge--success">Image actuelle rattachée</span>
+                  </div>
+                </div>
+              {% endif %}
+
+              <div class="form__field">
+                <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                <div class="file-upload-wrapper">
+                  {{ form.image }}
+                </div>
+                {% for erreur in form.image.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+              </div>
+
+              <div class="form__field">
+                <label for="{{ form.image_legende.id_for_label }}" class="form-label">{{ form.image_legende.label }}</label>
+                {{ form.image_legende }}
+                {% for erreur in form.image_legende.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Carte : Actions de validation -->
+          <div class="admin-card admin-card--actions">
+            <button type="submit" class="btn btn--gold btn--full btn--lg">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              {{ bouton_action }}
+            </button>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn--outline-dark btn--full">
+              Annuler
+            </a>
+          </div>
+
         </div>
-      </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn btn--gold btn--lg">{{ bouton_action }}</button>
-        <a href="{% url 'admin_dashboard' %}" class="btn btn--outline-dark">Annuler</a>
       </div>
-
     </form>
   </div>
 </section>
+
+<!-- Script interactif pour la barre d'outils Markdown et statistiques -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.getElementById("editor-contenu");
+  const statsEl = document.getElementById("editor-stats");
+
+  if (!textarea) return;
+
+  function updateStats() {
+    const text = textarea.value.trim();
+    const words = text ? text.split(/\s+/).length : 0;
+    const chars = textarea.value.length;
+    if (statsEl) {
+      statsEl.textContent = `${words} ${words > 1 ? 'mots' : 'mot'} • ${chars} ${chars > 1 ? 'caractères' : 'caractère'}`;
+    }
+  }
+
+  textarea.addEventListener("input", updateStats);
+  updateStats();
+
+  // Gestion des boutons Markdown
+  document.querySelectorAll(".toolbar-btn").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = textarea.value.substring(start, end);
+
+      const tag = this.getAttribute("data-tag");
+      const prefix = this.getAttribute("data-prefix");
+      const isLink = this.getAttribute("data-link");
+
+      let replacement = "";
+
+      if (tag) {
+        replacement = `${tag}${selected || "texte"}${tag}`;
+      } else if (prefix) {
+        replacement = `${prefix}${selected || "Titre"}`;
+      } else if (isLink) {
+        const url = prompt("Adresse du lien web (https://...) :", "https://");
+        if (url) {
+          replacement = `[${selected || "Texte du lien"}](${url})`;
+        } else {
+          return;
+        }
+      }
+
+      textarea.setRangeText(replacement, start, end, "select");
+      textarea.focus();
+      updateStats();
+    });
+  });
+});
+</script>
 {% endblock %}

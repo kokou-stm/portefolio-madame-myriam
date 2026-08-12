@@ -348,7 +348,7 @@ class Article(models.Model):
         related_name="articles",
     )
     chapo = models.TextField(
-        "Chapô",
+        "Résumé",
         blank=True,
         help_text="Résumé de deux ou trois lignes, affiché en tête d'article et dans la liste.",
     )

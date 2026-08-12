@@ -66,27 +66,48 @@ class ArticleForm(forms.ModelForm):
             "publie_le",
             "a_la_une",
         ]
+        labels = {
+            "titre": "Titre de la publication",
+            "rubrique": "Rubrique",
+            "chapo": "Résumé (Accroche)",
+            "contenu": "Corps du texte",
+            "image": "Image d'illustration",
+            "image_legende": "Légende du visuel",
+            "statut": "Statut de parution",
+            "publie_le": "Date et heure de publication",
+            "a_la_une": "Mettre cette publication à la une",
+        }
         widgets = {
             "titre": forms.TextInput(
-                attrs={"placeholder": "Ex: Rencontre et échange sur l'assurance inclusive…"}
+                attrs={
+                    "placeholder": "Ex: Discours officiel sur l'extension de l'assurance maladie...",
+                    "class": "form-input form-input--lg",
+                }
             ),
             "chapo": forms.Textarea(
                 attrs={
                     "rows": 3,
-                    "placeholder": "Court résumé d'accroche pour la liste et les réseaux…",
+                    "placeholder": "Brève synthèse de 2 à 3 phrases pour capter l'attention dans la liste d'actualités et sur les réseaux sociaux...",
+                    "class": "form-textarea",
                 }
             ),
             "contenu": forms.Textarea(
                 attrs={
                     "rows": 12,
-                    "placeholder": "Rédigez ici le texte complet. Vous pouvez utiliser du texte simple ou du Markdown (**gras**, *italique*, ## Intertitre…)",
+                    "placeholder": "Rédigez ou collez ici le texte complet. Vous pouvez structurer votre texte avec du Markdown simple (**gras**, *italique*, ## Titre de section...)",
+                    "class": "form-textarea form-textarea--editor",
+                    "id": "editor-contenu",
                 }
             ),
             "image_legende": forms.TextInput(
-                attrs={"placeholder": "Ex: Cérémonie d'ouverture, Lomé le 12 août…"}
+                attrs={
+                    "placeholder": "Ex: Cérémonie officielle de signature, Lomé le 12 août...",
+                    "class": "form-input",
+                }
             ),
             "publie_le": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+                attrs={"type": "datetime-local", "class": "form-input"},
+                format="%Y-%m-%dT%H:%M",
             ),
         }
 
