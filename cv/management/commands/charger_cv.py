@@ -179,10 +179,21 @@ FORMATIONS = [
 
 DISTINCTIONS = [
     {
+        "intitule": "Marraine de la Jeune Chambre Internationale du Togo",
+        "detail": (
+            "Accompagnement et parrainage officiel du mandat 2022 de la JCI Togo, "
+            "en appui à l'engagement citoyen, à l'entrepreneuriat et au leadership des jeunes actifs."
+        ),
+        "annee": "2022",
+        "photo_fichier": "img/evenements/jeunesse-parole.jpg",
+        "photo_legende": "Parrainage officiel et intervention devant la Jeune Chambre Internationale du Togo",
+        "photo_credit": "Cabinet / Ministère",
+    },
+    {
         "intitule": "Docteur Honoris Causa",
         "detail": (
-            "Décerné par le Centre de Valorisation Professionnelle de Tunis et l'Institut "
-            "Africain de Recherche Pluridisciplinaire Appliquée."
+            "Décerné en novembre 2024 à Abidjan par le Centre de Valorisation Professionnelle de Tunis "
+            "et l'Institut Africain de Recherche Pluridisciplinaire Appliquée (IARPA) pour sa contribution au développement."
         ),
         "annee": "2024",
         "photo_fichier": "img/evenements/honoris-causa.jpg",
@@ -190,39 +201,48 @@ DISTINCTIONS = [
         "photo_credit": "Cabinet",
     },
     {
-        "intitule": "Prix du développement local et de la lutte contre la vulnérabilité",
-        "detail": "Sommet Africa Political Outlook, Bruxelles.",
+        "intitule": "Distinction pour le leadership africain & développement local",
+        "detail": (
+            "Prix du développement local et de la lutte contre la vulnérabilité décerné lors du sommet "
+            "Africa Political Outlook à Bruxelles en reconnaissance de son action publique."
+        ),
         "annee": "2025",
-        "photo_fichier": "img/evenements/conference-ministere.jpg",
-        "photo_legende": "Intervention au sommet pour le développement local et la lutte contre la vulnérabilité",
-        "photo_credit": "Ministère",
+        "photo_fichier": "img/evenements/leadership-africain.png",
+        "photo_legende": "Distinction pour le leadership africain et le développement local à Bruxelles",
+        "photo_credit": "Ministère / Cabinet",
     },
     {
-        "intitule": "Conseillère municipale",
-        "detail": "Élue locale de la commune du Golfe 4, à Lomé.",
+        "intitule": "Conseillère municipale de la commune du Golfe 4",
+        "detail": (
+            "Élue locale engagée au conseil municipal de la commune du Golfe 4 à Lomé, "
+            "pour le renforcement de l'action de proximité et le développement territorial."
+        ),
         "annee": "2019-2025",
-        "photo_fichier": "img/evenements/jeunesse-parole.jpg",
-        "photo_legende": "Engagement citoyen et proximité territoriale à Lomé",
+        "photo_fichier": "img/evenements/terrain.jpg",
+        "photo_legende": "Engagement citoyen et action municipale de proximité à Lomé",
         "photo_credit": "Cabinet",
     },
     {
-        "intitule": "Enseignante vacataire",
+        "intitule": "Enseignante vacataire CNAM / ENASS",
         "detail": (
-            "CNAM (France) et intervenante à l'ENASS de 2008 à 2015, au sein du MBA "
-            "Management de l'entreprise d'assurance, sur les marchés internationaux."
+            "Intervenante de 2008 à 2015 au Conservatoire National des Arts et Métiers (France) "
+            "et à l'École Nationale d'Assurance (ENASS - Paris) au sein du MBA Management de l'Entreprise d'Assurances."
         ),
         "annee": "2008-2015",
         "photo_fichier": "img/galerie/portrait-gouvernement.jpg",
-        "photo_legende": "Transmission et enseignement supérieur en assurance",
+        "photo_legende": "Transmission et enseignement supérieur en assurance internationale",
         "photo_credit": "Fdimpact",
     },
     {
-        "intitule": "Thèse professionnelle",
-        "detail": "« La réassurance dans la zone CIMA : approche de groupe ».",
-        "annee": "",
-        "photo_fichier": "img/evenements/inam-signature.jpg",
-        "photo_legende": "Expertise technique en assurance et réassurance CIMA",
-        "photo_credit": "INAM / Cabinet",
+        "intitule": "Thèse professionnelle sur la réassurance CIMA",
+        "detail": (
+            "Travail de recherche et mémoire professionnel intitulé « La réassurance dans la zone CIMA : "
+            "approche de groupe », présenté à l'ENASS (Paris)."
+        ),
+        "annee": "2005",
+        "photo_fichier": "img/evenements/these-professionnelle.png",
+        "photo_legende": "Thèse professionnelle en réassurance CIMA — ENASS Paris",
+        "photo_credit": "Archives personnelles / Cabinet",
     },
 ]
 

@@ -14,13 +14,58 @@
     </div>
 
     <div class="bio">
-      <div class="bio__portrait">
-        {% if profil.photo %}
-          <img src="{{ profil.photo.url }}" alt="Portrait de {{ profil.nom }}">
-        {% else %}
-          <img src="{% static 'img/myriam-dossou.png' %}" alt="Portrait de {{ profil.nom }}">
-        {% endif %}
-        <p class="bio__legende">{{ profil.nom }}<br><span>{{ profil.sous_titre }}</span></p>
+      <div class="bio__speaker-card">
+        <span class="speaker-card__eyebrow">INTERVENANTE OFFICIELLE</span>
+        
+        <div class="speaker-card__medallion">
+          <img src="{% if profil.photo %}{{ profil.photo.url }}{% else %}{% static 'img/galerie/portrait-gouvernement.jpg' %}{% endif %}" alt="Portrait de {{ profil.nom }}">
+        </div>
+
+        <h3 class="speaker-card__name">Hon. {{ profil.nom }}</h3>
+        
+        <div class="speaker-card__roles">
+          <p class="speaker-card__role speaker-card__role--primary">
+            Vice-Présidente de l'Assemblée nationale du Togo
+          </p>
+          <p class="speaker-card__role">
+            Ancienne Ministre du Développement à la Base, de la Jeunesse et de l'Emploi des Jeunes
+          </p>
+          <p class="speaker-card__role">
+            Ancienne Directrice Générale de l'INAM
+          </p>
+        </div>
+
+        <span class="speaker-card__watermark">RÉPUBLIQUE TOGOLAISE</span>
+
+        <div class="speaker-card__footer">
+          <div class="speaker-card__socials">
+            {% if profil.facebook %}
+              <a href="{{ profil.facebook }}" target="_blank" rel="noopener noreferrer" title="Facebook">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+              </a>
+            {% endif %}
+            {% if profil.twitter %}
+              <a href="{{ profil.twitter }}" target="_blank" rel="noopener noreferrer" title="X / Twitter">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+              </a>
+            {% endif %}
+            {% if profil.instagram %}
+              <a href="{{ profil.instagram }}" target="_blank" rel="noopener noreferrer" title="Instagram">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              </a>
+            {% endif %}
+            {% if profil.tiktok %}
+              <a href="{{ profil.tiktok }}" target="_blank" rel="noopener noreferrer" title="TikTok">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.36 1.48-1.4 2.47-.04 1.14.47 2.27 1.34 2.93.9.7 2.14.86 3.19.46 1.01-.38 1.76-1.28 1.94-2.33.08-1.18.04-2.36.04-3.55V.02z"></path></svg>
+              </a>
+            {% endif %}
+          </div>
+
+          <a href="{% url 'galerie' %}" class="speaker-card__badge-btn">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Vidéo
+          </a>
+        </div>
       </div>
       <div class="bio__texte">
         {% if profil.biographie %}
