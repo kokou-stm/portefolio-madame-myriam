@@ -32,14 +32,26 @@ class MessageForm(forms.ModelForm):
 
 class ConnexionForm(forms.Form):
     username = forms.CharField(
-        label="Nom d'utilisateur",
+        label="Identifiant ou Adresse e-mail",
         widget=forms.TextInput(
-            attrs={"placeholder": "Ex. admin", "autofocus": True}
+            attrs={
+                "placeholder": "contact@myriamdossou.com",
+                "autofocus": True,
+                "class": "form-input form-input--icon",
+                "autocomplete": "username",
+            }
         ),
     )
     password = forms.CharField(
         label="Mot de passe",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "••••••••••••",
+                "class": "form-input form-input--icon",
+                "autocomplete": "current-password",
+                "id": "input-password",
+            }
+        ),
     )
 
 
