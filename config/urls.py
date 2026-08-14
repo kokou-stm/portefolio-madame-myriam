@@ -27,3 +27,6 @@ else:
             name="media",
         ),
     ]
+
+handler404 = "cv.views.page_not_found"
+handler500 = "cv.views.server_error"

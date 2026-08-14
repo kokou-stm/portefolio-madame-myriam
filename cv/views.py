@@ -294,3 +294,14 @@ def admin_article_supprimer(request, pk):
         messages.success(request, f"La publication « {titre} » a été supprimée.")
     return redirect("admin_dashboard")
 
+
+def page_not_found(request, exception=None):
+    """Page d'erreur 404 personnalisée."""
+    return render(request, "404.html", {"profil": _profil()}, status=404)
+
+
+def server_error(request):
+    """Page d'erreur 500 personnalisée."""
+    return render(request, "500.html", {"profil": _profil()}, status=500)
+
+

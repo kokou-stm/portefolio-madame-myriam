@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Erreur serveur (500) — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section error-page-section">
+  <div class="wrap wrap--narrow">
+    <div class="error-page-card">
+      <div class="error-page-card__top-bar"></div>
+
+      <div class="error-page-card__header">
+        <span class="error-badge error-badge--500">500 • ERREUR SERVEUR</span>
+        <h1 class="error-title">Une erreur est survenue</h1>
+        <p class="error-description">
+          Un problème technique temporaire s'est produit lors du traitement de votre demande. Nos équipes ont été notifiées.
+        </p>
+      </div>
+
+      <div class="error-page-actions">
+        <a href="{% url 'accueil' %}" class="btn btn--gold btn--lg">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Retourner à l'accueil
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Page introuvable (404) — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section error-page-section">
+  <div class="wrap wrap--narrow">
+    <div class="error-page-card">
+      <div class="error-page-card__top-bar"></div>
+
+      <div class="error-page-card__header">
+        <span class="error-badge">404 • PAGE INTROUVABLE</span>
+        <h1 class="error-title">Page non trouvée</h1>
+        <p class="error-description">
+          Désolé, la page ou la publication que vous recherchez n'existe pas, a été déplacée ou n'est temporairement plus accessible.
+        </p>
+      </div>
+
+      <div class="error-page-actions">
+        <a href="{% url 'accueil' %}" class="btn btn--gold btn--lg">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Retourner à l'accueil
+        </a>
+
+        <div class="error-quick-links">
+          <p class="quick-links-title">Accès rapide aux sections du site :</p>
+          <div class="quick-links-grid">
+            <a href="{% url 'publications' %}" class="quick-link-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l5 5v11a2 2 0 0 1-2 2z"></path></svg>
+              Actualités & Publications
+            </a>
+            <a href="{% url 'realisations' %}" class="quick-link-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              Réalisations
+            </a>
+            <a href="{% url 'parcours' %}" class="quick-link-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              Parcours & Expériences
+            </a>
+            <a href="{% url 'contact' %}" class="quick-link-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              Formulaire de Contact
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
