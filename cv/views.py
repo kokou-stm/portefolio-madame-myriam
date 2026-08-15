@@ -108,6 +108,9 @@ def galerie(request):
     if thematique_slug:
         videos = videos.filter(thematique=thematique_slug)
 
+    shorts = [v for v in videos if v.est_short]
+    videos_longues = [v for v in videos if not v.est_short]
+
     return render(
         request,
         "cv/galerie.html",
@@ -115,6 +118,8 @@ def galerie(request):
             "profil": _profil(),
             "photos": Photo.objects.all(),
             "videos": videos,
+            "shorts": shorts,
+            "videos_longues": videos_longues,
             "thematiques": Video.THEMATIQUES,
             "thematique_active": thematique_slug,
         },

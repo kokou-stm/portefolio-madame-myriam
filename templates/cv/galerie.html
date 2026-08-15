@@ -31,47 +31,92 @@
       {% endfor %}
     </nav>
 
-    <!-- Grille des Vidéos YouTube -->
-    {% if videos %}
-      <div class="visiotheque-grid">
-        {% for video in videos %}
-          <div class="video-card {% if video.est_short %}video-card--short{% else %}video-card--standard{% endif %}">
-            <div class="video-card__badge">
-              <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
-              {% if video.est_short %}
+    <!-- SECTION 1 : FORMAT COURT / SHORTS (3 par ligne) -->
+    {% if shorts %}
+      <div class="visiotheque-groupe">
+        <h3 class="visiotheque-titre-groupe">📱 Formats Courts & Shorts</h3>
+        <div class="shorts-grid">
+          {% for video in shorts %}
+            <div class="video-card video-card--short">
+              <div class="video-card__badge">
+                <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
                 <span class="badge badge--short">📱 Short</span>
-              {% endif %}
-            </div>
+              </div>
 
-            <div class="video-card__player">
-              <iframe src="{{ video.embed_url }}"
-                      title="{{ video.titre }}"
-                      frameborder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerpolicy="strict-origin-when-cross-origin"
-                      allowfullscreen
-                      loading="lazy">
-              </iframe>
-            </div>
+              <div class="video-card__player">
+                <iframe src="{{ video.embed_url }}"
+                        title="{{ video.titre }}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                        loading="lazy">
+                </iframe>
+              </div>
 
-            <div class="video-card__body">
-              <h3 class="video-card__title">{{ video.titre }}</h3>
-              {% if video.legende %}
-                <p class="video-card__legende">{{ video.legende }}</p>
-              {% endif %}
-              <div class="video-card__footer">
-                {% if video.date %}
-                  <span class="video-card__date">📅 {{ video.date }}</span>
+              <div class="video-card__body">
+                <h4 class="video-card__title">{{ video.titre }}</h4>
+                {% if video.legende %}
+                  <p class="video-card__legende">{{ video.legende }}</p>
                 {% endif %}
-                <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
-                  Regarder sur YouTube ↗
-                </a>
+                <div class="video-card__footer">
+                  {% if video.date %}
+                    <span class="video-card__date">📅 {{ video.date }}</span>
+                  {% endif %}
+                  <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
+                    Sur YouTube ↗
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
-    {% else %}
+    {% endif %}
+
+    <!-- SECTION 2 : VIDÉOS LARGES / REPORTAGES (2 par ligne) -->
+    {% if videos_longues %}
+      <div class="visiotheque-groupe">
+        <h3 class="visiotheque-titre-groupe">🎬 Reportages & Interventions d'exception</h3>
+        <div class="videos-longues-grid">
+          {% for video in videos_longues %}
+            <div class="video-card video-card--standard">
+              <div class="video-card__badge">
+                <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
+              </div>
+
+              <div class="video-card__player">
+                <iframe src="{{ video.embed_url }}"
+                        title="{{ video.titre }}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                        loading="lazy">
+                </iframe>
+              </div>
+
+              <div class="video-card__body">
+                <h4 class="video-card__title">{{ video.titre }}</h4>
+                {% if video.legende %}
+                  <p class="video-card__legende">{{ video.legende }}</p>
+                {% endif %}
+                <div class="video-card__footer">
+                  {% if video.date %}
+                    <span class="video-card__date">📅 {{ video.date }}</span>
+                  {% endif %}
+                  <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
+                    Regarder sur YouTube ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if not videos %}
       <p class="note-vide">Aucune vidéo disponible pour cette thématique pour le moment.</p>
     {% endif %}
 
