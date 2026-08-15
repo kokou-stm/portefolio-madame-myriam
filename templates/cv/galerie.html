@@ -31,16 +31,15 @@
       {% endfor %}
     </nav>
 
-    <!-- SECTION 1 : FORMAT COURT / SHORTS (3 par ligne) -->
+    <!-- SECTION 1 : FORMAT COURT (3 par ligne) -->
     {% if shorts %}
       <div class="visiotheque-groupe">
-        <h3 class="visiotheque-titre-groupe">📱 Formats Courts & Shorts</h3>
+        <h3 class="visiotheque-titre-groupe">📱 Formats Courts</h3>
         <div class="shorts-grid">
           {% for video in shorts %}
             <div class="video-card video-card--short">
               <div class="video-card__badge">
                 <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
-                <span class="badge badge--short">📱 Short</span>
               </div>
 
               <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
