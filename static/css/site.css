@@ -3654,6 +3654,45 @@ img {
   width: 100%;
   position: relative;
   background: #0b1424;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.video-card__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.video-card__player:hover .video-card__thumb {
+  transform: scale(1.04);
+  filter: brightness(0.85);
+}
+
+.video-card__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 12;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-card__player:hover .video-card__play {
+  transform: translate(-50%, -50%) scale(1.15);
+  filter: drop-shadow(0 0 16px rgba(212, 175, 55, 0.7));
 }
 
 .video-card--standard .video-card__player {

@@ -43,15 +43,14 @@
                 <span class="badge badge--short">📱 Short</span>
               </div>
 
-              <div class="video-card__player">
-                <iframe src="{{ video.embed_url }}"
-                        title="{{ video.titre }}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allowfullscreen
-                        loading="lazy">
-                </iframe>
+              <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+                <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
+                <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
+                  <svg width="54" height="54" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5"/>
+                    <polygon points="19,14 34,24 19,34" fill="#d4af37"/>
+                  </svg>
+                </button>
               </div>
 
               <div class="video-card__body">
@@ -85,15 +84,14 @@
                 <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
               </div>
 
-              <div class="video-card__player">
-                <iframe src="{{ video.embed_url }}"
-                        title="{{ video.titre }}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allowfullscreen
-                        loading="lazy">
-                </iframe>
+              <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+                <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
+                <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
+                  <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5"/>
+                    <polygon points="19,14 34,24 19,34" fill="#d4af37"/>
+                  </svg>
+                </button>
               </div>
 
               <div class="video-card__body">
@@ -173,4 +171,15 @@
 
 {% block scripts %}
   {% if photos %}<script src="{% static 'js/galerie.js' %}" defer></script>{% endif %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.video-card__player').forEach(function(player) {
+        player.addEventListener('click', function() {
+          var embedUrl = this.getAttribute('data-embed-url');
+          var title = this.getAttribute('data-title');
+          this.innerHTML = '<iframe src="' + embedUrl + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+        });
+      });
+    });
+  </script>
 {% endblock %}
