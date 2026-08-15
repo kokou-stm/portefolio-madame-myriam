@@ -19,6 +19,7 @@ from .models import (
     Profil,
     Realisation,
     Rubrique,
+    Video,
 )
 
 
@@ -102,12 +103,20 @@ def engagements(request):
 
 
 def galerie(request):
+    thematique_slug = request.GET.get("thematique")
+    videos = Video.objects.all()
+    if thematique_slug:
+        videos = videos.filter(thematique=thematique_slug)
+
     return render(
         request,
         "cv/galerie.html",
         {
             "profil": _profil(),
             "photos": Photo.objects.all(),
+            "videos": videos,
+            "thematiques": Video.THEMATIQUES,
+            "thematique_active": thematique_slug,
         },
     )
 

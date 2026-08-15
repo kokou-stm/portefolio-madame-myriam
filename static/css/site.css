@@ -3561,6 +3561,113 @@ img {
   box-shadow: 0 4px 12px rgba(197, 155, 39, 0.15);
 }
 
+/* -------------------------- Visiothèque Vidéos --------------------------- */
+
+.section__head--marge-haute {
+  margin-top: 4.5rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+}
+
+.visiotheque-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin: 2.5rem 0 3.5rem;
+}
+
+.video-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
+  border-color: var(--gold);
+}
+
+.video-card__badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.badge--short {
+  background: rgba(220, 38, 38, 0.9) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+}
+
+.video-card__player {
+  width: 100%;
+  position: relative;
+  background: #0b1424;
+}
+
+.video-card--standard .video-card__player {
+  padding-top: 56.25%; /* Ratio 16:9 */
+}
+
+.video-card--short .video-card__player {
+  padding-top: 130%; /* Ratio 9:16 vertical adapté */
+  max-height: 480px;
+}
+
+.video-card__player iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-card__body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.video-card__title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 0.6rem;
+  line-height: 1.4;
+}
+
+.video-card__legende {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.video-card__date {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gold-dark, #b58d20);
+}
+
+
 
 
 

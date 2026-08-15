@@ -29,6 +29,7 @@ class Command(BaseCommand):
         call_command("charger_realisations")
         call_command("charger_galerie")
         call_command("charger_articles")
+        call_command("charger_videos")
 
         identifiant = os.environ.get("DJANGO_ADMIN_USER")
         motdepasse = os.environ.get("DJANGO_ADMIN_PASSWORD")

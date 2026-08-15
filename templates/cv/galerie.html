@@ -1,45 +1,81 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Galerie — {{ profil.nom }}{% endblock %}
-{% block description %}Galerie photo de {{ profil.nom }} : cérémonies, missions de terrain et temps forts.{% endblock %}
+{% block title %}Galerie & Visiothèque — {{ profil.nom }}{% endblock %}
+{% block description %}Galerie vidéo et photo de {{ profil.nom }} : interventions parlementaires, protection sociale et missions de terrain.{% endblock %}
 
 {% block contenu %}
 
-{% comment %}
-Sans JavaScript, l'apparition au défilement ne se déclenche pas : on rend
-alors les images directement visibles plutôt que transparentes.
-{% endcomment %}
 <noscript>
-  <style>.galerie__item { opacity: 1; transform: none; }</style>
+  <style>.galerie__item, .video-card { opacity: 1; transform: none; }</style>
 </noscript>
 
 <section class="section">
   <div class="wrap">
     <div class="section__head">
-      <p class="eyebrow">Galerie</p>
-      <h2>En images</h2>
-      <p class="lede">Cérémonies, missions de terrain et temps forts de la vie
-        publique et parlementaire.</p>
+      <p class="eyebrow">Galerie & Visiothèque</p>
+      <h2>Interventions et moments forts en vidéo</h2>
+      <p class="lede">Retrouvez les prises de parole, déclarations officielles et reportages de terrain de {{ profil.nom }}, classés par thématique.</p>
+    </div>
+
+    <!-- Onglets de filtres par thématique -->
+    <nav class="filtres filtres--centre" aria-label="Filtrer les vidéos par thématique">
+      <a class="filtres__lien {% if not thematique_active %}est-actif{% endif %}" href="{% url 'galerie' %}">
+        Toutes les vidéos
+      </a>
+      {% for code, label in thematiques %}
+        <a class="filtres__lien {% if thematique_active == code %}est-actif{% endif %}"
+           href="{% url 'galerie' %}?thematique={{ code }}">
+          {{ label }}
+        </a>
+      {% endfor %}
+    </nav>
+
+    <!-- Grille des Vidéos YouTube -->
+    {% if videos %}
+      <div class="visiotheque-grid">
+        {% for video in videos %}
+          <div class="video-card {% if video.est_short %}video-card--short{% else %}video-card--standard{% endif %}">
+            <div class="video-card__badge">
+              <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
+              {% if video.est_short %}
+                <span class="badge badge--short">📱 Short</span>
+              {% endif %}
+            </div>
+
+            <div class="video-card__player">
+              <iframe src="{{ video.embed_url }}"
+                      title="{{ video.titre }}"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen
+                      loading="lazy">
+              </iframe>
+            </div>
+
+            <div class="video-card__body">
+              <h3 class="video-card__title">{{ video.titre }}</h3>
+              {% if video.legende %}
+                <p class="video-card__legende">{{ video.legende }}</p>
+              {% endif %}
+              {% if video.date %}
+                <span class="video-card__date">📅 {{ video.date }}</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="note-vide">Aucune vidéo disponible pour cette thématique pour le moment.</p>
+    {% endif %}
+
+    <!-- Galerie Photos -->
+    <div class="section__head section__head--marge-haute">
+      <h2>Galerie Clichés & Archives</h2>
+      <p class="lede">Photographies de cérémonies, de la vie institutionnelle et des rencontres publiques.</p>
     </div>
 
     <div class="galerie" id="galerie">
-      <figure class="galerie__item galerie__item--video est-visible" style="--i: 0">
-        <div class="galerie__cadre galerie__cadre--video">
-          <video class="reel__media" controls playsinline preload="metadata"
-                 poster="{% static 'img/reel-poster.jpg' %}">
-            <source src="{% static 'videos/reel-myriam.mp4' %}" type="video/mp4">
-            Votre navigateur ne peut pas lire cette vidéo.
-          </video>
-        </div>
-        <figcaption>
-          <span class="galerie__legende">Intervention publique de {{ profil.nom }}</span>
-          <span class="galerie__date">Vidéo</span>
-          <a class="galerie__source" href="https://www.facebook.com/reel/1307475732440191"
-             target="_blank" rel="noopener noreferrer">Voir sur Facebook ↗</a>
-        </figcaption>
-      </figure>
-
       {% if photos %}
         {% for photo in photos %}
           <figure class="galerie__item" style="--i: {{ forloop.counter }}"

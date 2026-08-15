@@ -518,3 +518,54 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.nom} — {self.objet}"
+
+
+class Video(models.Model):
+    """Vidéo de la galerie : interventions, travaux parlementaires, reportages."""
+
+    PARLEMENT = "parlement"
+    PROTECTION = "protection"
+    JEUNESSE = "jeunesse"
+    DISCOURS = "discours"
+    THEMATIQUES = [
+        (PARLEMENT, "Travail parlementaire"),
+        (PROTECTION, "Protection sociale & AMU"),
+        (JEUNESSE, "Jeunesse & Développement"),
+        (DISCOURS, "Discours & Événements"),
+    ]
+
+    titre = models.CharField("Titre de la vidéo", max_length=220)
+    youtube_url = models.URLField("Lien YouTube", max_length=500)
+    youtube_id = models.CharField("ID YouTube", max_length=50, blank=True)
+    est_short = models.BooleanField("Format Short (vertical)", default=False)
+    thematique = models.CharField(
+        "Thématique", max_length=30, choices=THEMATIQUES, default=PARLEMENT
+    )
+    date = models.CharField("Date ou période", max_length=60, blank=True)
+    legende = models.CharField("Description / Légende", max_length=250, blank=True)
+    ordre = models.PositiveSmallIntegerField("Ordre", default=0)
+
+    class Meta:
+        verbose_name = "Vidéo"
+        verbose_name_plural = "Vidéos de la galerie"
+        ordering = ["ordre"]
+
+    def __str__(self):
+        return self.titre
+
+    def save(self, *args, **kwargs):
+        if not self.youtube_id and self.youtube_url:
+            import re
+
+            match = re.search(
+                r"(?:youtube\.com\/(?:shorts\/|watch\?v=)|youtu\.be\/)([\w-]+)",
+                self.youtube_url,
+            )
+            if match:
+                self.youtube_id = match.group(1)
+        super().save(*args, **kwargs)
+
+    @property
+    def embed_url(self):
+        return f"https://www.youtube.com/embed/{self.youtube_id}"
+
