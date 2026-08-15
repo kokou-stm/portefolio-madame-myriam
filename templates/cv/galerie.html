@@ -2,12 +2,19 @@
 {% load static %}
 
 {% block title %}Galerie & Visiothèque — {{ profil.nom }}{% endblock %}
-{% block description %}Galerie vidéo et photo de {{ profil.nom }} : interventions parlementaires, protection sociale et missions de terrain.{% endblock %}
+{% block description %}Galerie vidéo et photo de {{ profil.nom }} : interventions parlementaires, protection sociale et
+missions de terrain.{% endblock %}
 
 {% block contenu %}
 
 <noscript>
-  <style>.galerie__item, .video-card { opacity: 1; transform: none; }</style>
+  <style>
+    .galerie__item,
+    .video-card {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
 </noscript>
 
 <section class="section">
@@ -15,7 +22,8 @@
     <div class="section__head">
       <p class="eyebrow">Galerie & Visiothèque</p>
       <h2>Interventions et moments forts en vidéo</h2>
-      <p class="lede">Retrouvez les prises de parole, déclarations officielles et reportages de terrain de {{ profil.nom }}, classés par thématique.</p>
+      <p class="lede">Retrouvez les prises de parole, déclarations officielles et reportages de terrain de {{ profil.nom
+        }}, classés par thématique.</p>
     </div>
 
     <!-- Onglets de filtres par thématique -->
@@ -24,97 +32,95 @@
         Toutes les vidéos
       </a>
       {% for code, label in thematiques %}
-        <a class="filtres__lien {% if thematique_active == code %}est-actif{% endif %}"
-           href="{% url 'galerie' %}?thematique={{ code }}">
-          {{ label }}
-        </a>
+      <a class="filtres__lien {% if thematique_active == code %}est-actif{% endif %}"
+        href="{% url 'galerie' %}?thematique={{ code }}">
+        {{ label }}
+      </a>
       {% endfor %}
     </nav>
 
-    <!-- SECTION 1 : FORMAT COURT (3 par ligne) -->
+    <!-- SECTION 1 : FORMATS COMPACTS (3 par ligne) -->
     {% if shorts %}
-      <div class="visiotheque-groupe">
-        <h3 class="visiotheque-titre-groupe">📱 Formats Courts</h3>
-        <div class="shorts-grid">
-          {% for video in shorts %}
-            <div class="video-card video-card--short">
-              <div class="video-card__badge">
-                <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
-              </div>
+    <div class="visiotheque-groupe">
+      <div class="shorts-grid">
+        {% for video in shorts %}
+        <div class="video-card video-card--short">
+          <div class="video-card__badge">
+            <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
+          </div>
 
-              <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
-                <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
-                <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
-                  <svg width="54" height="54" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5"/>
-                    <polygon points="19,14 34,24 19,34" fill="#d4af37"/>
-                  </svg>
-                </button>
-              </div>
+          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+            <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
+            <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
+              <svg width="54" height="54" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />
+                <polygon points="19,14 34,24 19,34" fill="#d4af37" />
+              </svg>
+            </button>
+          </div>
 
-              <div class="video-card__body">
-                <h4 class="video-card__title">{{ video.titre }}</h4>
-                {% if video.legende %}
-                  <p class="video-card__legende">{{ video.legende }}</p>
-                {% endif %}
-                <div class="video-card__footer">
-                  {% if video.date %}
-                    <span class="video-card__date">📅 {{ video.date }}</span>
-                  {% endif %}
-                  <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
-                    Sur YouTube ↗
-                  </a>
-                </div>
-              </div>
+          <div class="video-card__body">
+            <h4 class="video-card__title">{{ video.titre }}</h4>
+            {% if video.legende %}
+            <p class="video-card__legende">{{ video.legende }}</p>
+            {% endif %}
+            <div class="video-card__footer">
+              {% if video.date %}
+              <span class="video-card__date">📅 {{ video.date }}</span>
+              {% endif %}
+              <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
+                Sur YouTube ↗
+              </a>
             </div>
-          {% endfor %}
+          </div>
         </div>
+        {% endfor %}
       </div>
+    </div>
     {% endif %}
 
     <!-- SECTION 2 : VIDÉOS LARGES / REPORTAGES (2 par ligne) -->
     {% if videos_longues %}
-      <div class="visiotheque-groupe">
-        <h3 class="visiotheque-titre-groupe">🎬 Reportages & Interventions d'exception</h3>
-        <div class="videos-longues-grid">
-          {% for video in videos_longues %}
-            <div class="video-card video-card--standard">
-              <div class="video-card__badge">
-                <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
-              </div>
+    <div class="visiotheque-groupe">
+      <div class="videos-longues-grid">
+        {% for video in videos_longues %}
+        <div class="video-card video-card--standard">
+          <div class="video-card__badge">
+            <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
+          </div>
 
-              <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
-                <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
-                <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
-                  <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5"/>
-                    <polygon points="19,14 34,24 19,34" fill="#d4af37"/>
-                  </svg>
-                </button>
-              </div>
+          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+            <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
+            <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
+              <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />
+                <polygon points="19,14 34,24 19,34" fill="#d4af37" />
+              </svg>
+            </button>
+          </div>
 
-              <div class="video-card__body">
-                <h4 class="video-card__title">{{ video.titre }}</h4>
-                {% if video.legende %}
-                  <p class="video-card__legende">{{ video.legende }}</p>
-                {% endif %}
-                <div class="video-card__footer">
-                  {% if video.date %}
-                    <span class="video-card__date">📅 {{ video.date }}</span>
-                  {% endif %}
-                  <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
-                    Regarder sur YouTube ↗
-                  </a>
-                </div>
-              </div>
+          <div class="video-card__body">
+            <h4 class="video-card__title">{{ video.titre }}</h4>
+            {% if video.legende %}
+            <p class="video-card__legende">{{ video.legende }}</p>
+            {% endif %}
+            <div class="video-card__footer">
+              {% if video.date %}
+              <span class="video-card__date">📅 {{ video.date }}</span>
+              {% endif %}
+              <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
+                Regarder sur YouTube ↗
+              </a>
             </div>
-          {% endfor %}
+          </div>
         </div>
+        {% endfor %}
       </div>
+    </div>
     {% endif %}
 
     {% if not videos %}
-      <p class="note-vide">Aucune vidéo disponible pour cette thématique pour le moment.</p>
+    <p class="note-vide">Aucune vidéo disponible pour cette thématique pour le moment.</p>
     {% endif %}
 
     <!-- Galerie Photos -->
@@ -125,60 +131,59 @@
 
     <div class="galerie" id="galerie">
       {% if photos %}
-        {% for photo in photos %}
-          <figure class="galerie__item" style="--i: {{ forloop.counter }}"
-                  role="button" tabindex="0"
-                  data-src="{{ photo.src }}"
-                  data-legende="{{ photo.legende }}"
-                  data-credit="{% if photo.credit_complet %}© {{ photo.credit_complet }}{% endif %}">
-            <div class="galerie__cadre">
-              <img src="{{ photo.src }}" alt="{{ photo.legende|default:'Photo' }}" loading="lazy">
-              <span class="galerie__loupe" aria-hidden="true"></span>
-            </div>
-            {% if photo.legende or photo.date or photo.credit_complet %}
-              <figcaption>
-                {% if photo.legende %}<span class="galerie__legende">{{ photo.legende }}</span>{% endif %}
-                {% if photo.date %}<span class="galerie__date">{{ photo.date }}</span>{% endif %}
-                {% if photo.credit_complet %}<span class="galerie__credit">© {{ photo.credit_complet }}</span>{% endif %}
-              </figcaption>
-            {% endif %}
-          </figure>
-        {% endfor %}
+      {% for photo in photos %}
+      <figure class="galerie__item" style="--i: {{ forloop.counter }}" role="button" tabindex="0"
+        data-src="{{ photo.src }}" data-legende="{{ photo.legende }}"
+        data-credit="{% if photo.credit_complet %}© {{ photo.credit_complet }}{% endif %}">
+        <div class="galerie__cadre">
+          <img src="{{ photo.src }}" alt="{{ photo.legende|default:'Photo' }}" loading="lazy">
+          <span class="galerie__loupe" aria-hidden="true"></span>
+        </div>
+        {% if photo.legende or photo.date or photo.credit_complet %}
+        <figcaption>
+          {% if photo.legende %}<span class="galerie__legende">{{ photo.legende }}</span>{% endif %}
+          {% if photo.date %}<span class="galerie__date">{{ photo.date }}</span>{% endif %}
+          {% if photo.credit_complet %}<span class="galerie__credit">© {{ photo.credit_complet }}</span>{% endif %}
+        </figcaption>
+        {% endif %}
+      </figure>
+      {% endfor %}
       {% endif %}
     </div>
 
     {% if photos %}
-      <p class="note-sources">
-        Les photos disponibles sous licence libre sont créditées à leur auteur.
-        Les autres clichés proviennent des archives du cabinet.
-      </p>
+    <p class="note-sources">
+      Les photos disponibles sous licence libre sont créditées à leur auteur.
+      Les autres clichés proviennent des archives du cabinet.
+    </p>
     {% endif %}
   </div>
 </section>
 
 {% if photos %}
-  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
-    <button class="lightbox__fermer" type="button" aria-label="Fermer">&times;</button>
-    <figure class="lightbox__figure">
-      <img src="" alt="">
-      <figcaption></figcaption>
-    </figure>
-  </div>
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
+  <button class="lightbox__fermer" type="button" aria-label="Fermer">&times;</button>
+  <figure class="lightbox__figure">
+    <img src="" alt="">
+    <figcaption></figcaption>
+  </figure>
+</div>
 {% endif %}
 
 {% endblock %}
 
 {% block scripts %}
-  {% if photos %}<script src="{% static 'js/galerie.js' %}" defer></script>{% endif %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.video-card__player').forEach(function(player) {
-        player.addEventListener('click', function() {
-          var embedUrl = this.getAttribute('data-embed-url');
-          var title = this.getAttribute('data-title');
-          this.innerHTML = '<iframe src="' + embedUrl + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
-        });
+{% if photos %}
+<script src="{% static 'js/galerie.js' %}" defer></script>{% endif %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.video-card__player').forEach(function (player) {
+      player.addEventListener('click', function () {
+        var embedUrl = this.getAttribute('data-embed-url');
+        var title = this.getAttribute('data-title');
+        this.innerHTML = '<iframe src="' + embedUrl + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
       });
     });
-  </script>
+  });
+</script>
 {% endblock %}
