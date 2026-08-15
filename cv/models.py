@@ -567,5 +567,9 @@ class Video(models.Model):
 
     @property
     def embed_url(self):
-        return f"https://www.youtube.com/embed/{self.youtube_id}"
+        return f"https://www.youtube-nocookie.com/embed/{self.youtube_id}?rel=0"
+
+    @property
+    def thumbnail_url(self):
+        return f"https://img.youtube.com/vi/{self.youtube_id}/hqdefault.jpg"
 

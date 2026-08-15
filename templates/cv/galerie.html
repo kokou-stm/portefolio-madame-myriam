@@ -48,6 +48,7 @@
                       title="{{ video.titre }}"
                       frameborder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerpolicy="strict-origin-when-cross-origin"
                       allowfullscreen
                       loading="lazy">
               </iframe>
@@ -58,9 +59,14 @@
               {% if video.legende %}
                 <p class="video-card__legende">{{ video.legende }}</p>
               {% endif %}
-              {% if video.date %}
-                <span class="video-card__date">📅 {{ video.date }}</span>
-              {% endif %}
+              <div class="video-card__footer">
+                {% if video.date %}
+                  <span class="video-card__date">📅 {{ video.date }}</span>
+                {% endif %}
+                <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
+                  Regarder sur YouTube ↗
+                </a>
+              </div>
             </div>
           </div>
         {% endfor %}

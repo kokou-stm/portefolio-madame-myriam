@@ -3667,6 +3667,30 @@ img {
   color: var(--gold-dark, #b58d20);
 }
 
+.video-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.video-card__lien {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--gold);
+  transition: all 0.2s ease;
+}
+
+.video-card__lien:hover {
+  color: var(--gold-dark, #b58d20);
+  border-bottom-style: solid;
+}
+
 
 
 
