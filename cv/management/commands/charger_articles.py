@@ -1,5 +1,6 @@
 """Charge des articles et tribunes documentés pour garnir la section Actualités."""
 
+from datetime import datetime, timezone as dt_timezone
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.utils.text import slugify
@@ -11,6 +12,7 @@ ARTICLES = [
         "titre": "Journée de l'Arbre 2026 : Reboisement citoyen et engagement pour le développement durable",
         "rubrique_nom": "Événements",
         "a_la_une": True,
+        "publie_le": datetime(2026, 6, 1, 10, 0, tzinfo=dt_timezone.utc),
         "image_path": "img/evenements/journee-arbre-arrosage.jpeg",
         "image_legende": "Action de reboisement et d'arrosage des plants lors de la Journée de l'Arbre 2026",
         "chapo": (
@@ -32,7 +34,7 @@ ARTICLES = [
             "Au-delà de la mise en terre des plants, cette journée a été l'occasion d'échanger avec la jeunesse "
             "sur l'importance cruciale du suivi et de l'entretien des espaces reboisés.\n\n"
             "En cohérence avec les politiques de développement à la base et la vision nationale, cette initiative "
-            "s'inscrit dans l'ambition collective de renforcer la couverture forestière et la résilience écologue "
+            "s'inscrit dans l'ambition collective de renforcer la couverture forestière et la résilience écologique "
             "de nos communes."
         ),
     },
@@ -40,6 +42,7 @@ ARTICLES = [
         "titre": "Forum Régional sur l'Inclusion Financière et la Protection Sociale à Lomé",
         "rubrique_nom": "Événements",
         "a_la_une": False,
+        "publie_le": datetime(2026, 5, 15, 9, 30, tzinfo=dt_timezone.utc),
         "image_path": "img/evenements/conference-ministere.jpg",
         "image_legende": "Ouverture officielle du Forum Régional à Lomé",
         "chapo": (
@@ -64,9 +67,31 @@ ARTICLES = [
         ),
     },
     {
-        "titre": "Intervention à l'Assemblée nationale : Le cap de la cohésion sociale et du développement local (Juin 2024)",
+        "titre": "Retour sur la distinction Africa Political Outlook 2025 à Bruxelles",
+        "rubrique_nom": "Presse",
+        "a_la_une": False,
+        "publie_le": datetime(2025, 2, 12, 16, 0, tzinfo=dt_timezone.utc),
+        "image_path": "img/evenements/honoris-causa.jpg",
+        "image_legende": "Reconnaissance internationale décernée au sommet Africa Political Outlook 2025 à Bruxelles",
+        "chapo": (
+            "En février 2025 à Bruxelles, Myriam Dossou-D'Almeida a été honorée du Prix Leadership, Governance "
+            "& Impact au sommet Africa Political Outlook pour son engagement constant en faveur de l'inclusion "
+            "et du développement à la base."
+        ),
+        "contenu": (
+            "Réunis à Bruxelles lors de l'édition 2025 du sommet Africa Political Outlook, les dirigeants et "
+            "décideurs internationaux ont salué le parcours de Myriam Dossou-D'Almeida, ancienne Ministre et "
+            "6ᵉ Vice-Présidente de l'Assemblée nationale du Togo.\n\n"
+            "Cette distinction — le Prix Leadership, Governance & Impact 2025 — a récompensé son action continue "
+            "en faveur du développement local, de la structuration des régimes de protection sociale et de la "
+            "lutte contre la vulnérabilité dans les territoires."
+        ),
+    },
+    {
+        "titre": "Intervention à l'Assemblée nationale : Le cap de la cohésion sociale et du développement local",
         "rubrique_nom": "Discours",
         "a_la_une": False,
+        "publie_le": datetime(2024, 6, 14, 11, 0, tzinfo=dt_timezone.utc),
         "image_path": "img/assemblee-nationale.jpg",
         "image_legende": "Palais de l'Assemblée nationale du Togo, Lomé",
         "chapo": (
@@ -80,15 +105,36 @@ ARTICLES = [
             "s'est adressée à la représentation nationale pour poser les jalons de l'action parlementaire.\n\n"
             "### Renforcer l'action de proximité et le rôle des collectivités\n\n"
             "S'appuyant sur son expérience au ministère du Développement à la Base et à la municipalité "
-            "du Golfe 4, elle a insisté sur l'accompagnement des communes, le financement de "
+            "du Golfe 4, elle a insisted sur l'accompagnement des communes, le financement de "
             "l'entrepreneuriat des jeunes et la consolidation de la cohésion sociale comme axes "
             "stratégiques majeurs."
+        ),
+    },
+    {
+        "titre": "Accompagnement de l'entrepreneuriat : Bilan des financements accordés aux jeunes",
+        "rubrique_nom": "Actualités",
+        "a_la_une": False,
+        "publie_le": datetime(2024, 1, 28, 10, 0, tzinfo=dt_timezone.utc),
+        "image_path": "img/evenements/jeunesse-parole.jpg",
+        "image_legende": "Cérémonie de remise d'attestations et d'équipements aux jeunes promoteurs",
+        "chapo": (
+            "Le Fonds d'Appui aux Initiatives Économiques des Jeunes (FAIEJ) a permis de financer "
+            "1 852 nouveaux projets d'entreprise pour un montant de 2,68 milliards FCFA."
+        ),
+        "contenu": (
+            "Le bilan d'étape des mécanismes d'appui à la jeunesse confirme la dynamique de "
+            "création d'entreprises locales. Sous la tutelle du ministère du Développement à la Base "
+            "et de la Jeunesse, le FAIEJ a franchi le cap des 1 852 projets financés en une année.\n\n"
+            "Ces investissements ciblent prioritairement la transformation agricole, les services "
+            "numériques et l'artisanat, permettant d'insérer durablement les jeunes bacheliers et "
+            "diplômés dans le tissu économique national."
         ),
     },
     {
         "titre": "L'assurance maladie universelle : Un modèle d'extension progressive en Afrique de l'Ouest",
         "rubrique_nom": "Tribunes",
         "a_la_une": False,
+        "publie_le": datetime(2023, 11, 20, 14, 0, tzinfo=dt_timezone.utc),
         "image_path": "img/evenements/inam-signature.jpg",
         "image_legende": "Signature de partenariat institutionnel pour l'AMU",
         "chapo": (
@@ -106,45 +152,6 @@ ARTICLES = [
             "l'ensemble de la population."
         ),
     },
-    {
-        "titre": "Accompagnement de l'entrepreneuriat : Bilan des financements accordés aux jeunes",
-        "rubrique_nom": "Actualités",
-        "a_la_une": False,
-        "image_path": "img/evenements/jeunesse-parole.jpg",
-        "image_legende": "Cérémonie de remise d'attestations et d'équipements aux jeunes promoteurs",
-        "chapo": (
-            "Le Fonds d'Appui aux Initiatives Économiques des Jeunes (FAIEJ) a permis de financer "
-            "1 852 nouveaux projets d'entreprise pour un montant de 2,68 milliards FCFA."
-        ),
-        "contenu": (
-            "Le bilan d'étape des mécanismes d'appui à la jeunesse confirme la dynamique de "
-            "création d'entreprises locales. Sous la tutelle du ministère du Développement à la Base "
-            "et de la Jeunesse, le FAIEJ a franchi le cap des 1 852 projets financés en une année.\n\n"
-            "Ces investissements ciblent prioritairement la transformation agricole, les services "
-            "numériques et l'artisanat, permettant d'insérer durablement les jeunes bacheliers et "
-            "diplômés dans le tissu économique national."
-        ),
-    },
-    {
-        "titre": "Retour sur la distinction Africa Political Outlook 2025 à Bruxelles",
-        "rubrique_nom": "Presse",
-        "a_la_une": False,
-        "image_path": "img/evenements/honoris-causa.jpg",
-        "image_legende": "Reconnaissance internationale décernée au sommet Africa Political Outlook 2025 à Bruxelles",
-        "chapo": (
-            "En 2025 à Bruxelles, Myriam Dossou-D'Almeida a été honorée du Prix Leadership, Governance "
-            "& Impact au sommet Africa Political Outlook pour son engagement constant en faveur de l'inclusion "
-            "et du développement à la base."
-        ),
-        "contenu": (
-            "Réunis à Bruxelles lors de l'édition 2025 du sommet Africa Political Outlook, les dirigeants et "
-            "décideurs internationaux ont salué le parcours de Myriam Dossou-D'Almeida, ancienne Ministre et "
-            "6ᵉ Vice-Présidente de l'Assemblée nationale du Togo.\n\n"
-            "Cette distinction — le Prix Leadership, Governance & Impact 2025 — a récompensé son action continue "
-            "en faveur du développement local, de la structuration des régimes de protection sociale et de la "
-            "lutte contre la vulnérabilité dans les territoires."
-        ),
-    },
 ]
 
 
@@ -152,7 +159,6 @@ class Command(BaseCommand):
     help = "Charge des articles et tribunes dans la section Actualités."
 
     def handle(self, *args, **options):
-        # Suppression des anciennes publications seeds pour réaligner proprement les slugs
         Article.objects.all().delete()
         compteur = 0
         for i, donnees in enumerate(ARTICLES):
@@ -171,11 +177,11 @@ class Command(BaseCommand):
                     "image_legende": donnees["image_legende"],
                     "a_la_une": donnees["a_la_une"],
                     "statut": Article.PUBLIE,
-                    "publie_le": timezone.now(),
+                    "publie_le": donnees.get("publie_le", timezone.now()),
                 },
             )
             compteur += 1
 
         self.stdout.write(
-            self.style.SUCCESS(f"{compteur} articles chargés avec succès.")
+            self.style.SUCCESS(f"{compteur} articles chargés avec succès avec leurs dates historiques.")
         )
