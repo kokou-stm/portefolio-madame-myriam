@@ -39,6 +39,86 @@ ARTICLES = [
         ),
     },
     {
+        "titre": "Diaspora, capital et développement africain : transformer la générosité en partenariat durable",
+        "rubrique_nom": "Tribunes",
+        "a_la_une": False,
+        "publie_le": datetime(2026, 2, 10, 10, 0, tzinfo=dt_timezone.utc),
+        "image_path": "img/evenements/inam-signature.jpg",
+        "image_legende": "Myriam Dossou d'Almeida lors d'une intervention sur la mobilisation des compétences et la protection sociale",
+        "chapo": (
+            "Au-delà des transferts financiers de solidarité, Myriam Dossou d'Almeida plaide pour une "
+            "véritable stratégie publique de mobilisation des compétences de la diaspora, de l'épargne "
+            "productive et du transfert d'innovation vers le continent."
+        ),
+        "contenu": (
+            "Au cours de ma carrière, dans la conduite de politiques publiques, la gestion d’une institution "
+            "de protection sociale ou l’accompagnement d’initiatives de développement, j’ai eu à expérimenter, "
+            "à plusieurs reprises, la volonté sincère de nos frères et sœurs de la diaspora de contribuer "
+            "au progrès de leur pays d’origine.\n\n"
+            "Certains proposent leurs services. D’autres souhaitent partager une expertise acquise dans des "
+            "environnements professionnels exigeants. D’autres encore mobilisent leurs réseaux, offrent du matériel, "
+            "accompagnent des équipes, conseillent des entrepreneurs ou tentent d’introduire des solutions "
+            "technologiques nouvelles.\n\n"
+            "Il y a, derrière ces démarches, une forme de générosité qui ne dit pas toujours son nom. Une volonté "
+            "de transmettre, de rendre utile une expérience acquise ailleurs et de maintenir un lien concret avec le continent.\n\n"
+            "Cette énergie est précieuse. Pourtant, elle ne produit pas toujours les résultats espérés. "
+            "Non pas parce que la bonne volonté ferait défaut, mais parce qu’elle se heurte souvent à une "
+            "appréciation imparfaite des réalités locales, à des différences de vécu, de parcours, d’objectifs ou de méthodes.\n\n"
+            "### La diaspora apporte bien plus que des transferts financiers\n\n"
+            "Le rôle économique de la diaspora africaine est souvent mesuré à travers les transferts de fonds envoyés "
+            "aux familles. Ces ressources financent l’alimentation, les soins, l’éducation, le logement, les cérémonies "
+            "familiales et de nombreuses activités génératrices de revenus. Elles constituent un puissant mécanisme "
+            "de solidarité et, dans plusieurs pays, un véritable amortisseur social.\n\n"
+            "Selon la Banque mondiale, les transferts officiellement enregistrés vers l’Afrique subsaharienne étaient "
+            "estimés à environ **56 milliards de dollars en 2024**. À l’échelle des pays à revenu faible ou intermédiaire, "
+            "ces flux ont dépassé les investissements directs étrangers et l’aide publique au développement réunis.\n\n"
+            "Mais réduire la diaspora à ces seuls transferts serait une erreur. Son capital est aussi humain, intellectuel, "
+            "technologique, professionnel et relationnel.\n\n"
+            "> « L’innovation pertinente n’est pas celle qui reproduit mécaniquement un modèle extérieur. C’est celle qui associe l’expérience internationale à l’intelligence du terrain. »\n\n"
+            "À titre d’illustration, on peut citer plusieurs initiatives récentes portées par la diaspora africaine "
+            "et togolaise. La rencontre récente de médecins de la diaspora togolaise, par exemple, a permis de renforcer "
+            "les échanges avec les praticiens locaux autour de la formation continue, de la télémédecine et de l’amélioration "
+            "de la prise en charge de certaines pathologies. De même, le projet d’assurance maladie initié par la diaspora "
+            "togolaise en Belgique témoigne d’une volonté concrète de contribuer à la protection sociale au pays.\n\n"
+            "### Le retour se prépare comme un projet de vie\n\n"
+            "Le retour au pays est souvent envisagé comme la conséquence naturelle de l’attachement aux origines. "
+            "Or il constitue une transition personnelle, familiale, professionnelle et économique majeure. Il doit être préparé.\n\n"
+            "Il serait donc utile que les États développent de véritables parcours d’accompagnement : information avant le retour, "
+            "guichet unique, orientation professionnelle, reconnaissance des qualifications, assistance à la création d’entreprise, "
+            "facilitation administrative et mise en relation avec les institutions.\n\n"
+            "Le retour définitif ne doit toutefois pas constituer la seule forme d’engagement. Les mobilités circulaires, "
+            "les missions temporaires, l’enseignement à distance, le mentorat, le conseil stratégique et les collaborations "
+            "hybrides permettent également de mettre les compétences de la diaspora au service du continent.\n\n"
+            "### De la solidarité au capital productif\n\n"
+            "À côté des flux de solidarité familiale, une partie de l’épargne volontaire de la diaspora pourrait être "
+            "orientée vers des investissements productifs : entreprises, agriculture, logement, santé, énergie, infrastructures, "
+            "économie numérique, industrie et adaptation climatique.\n\n"
+            "Pour y parvenir, il ne suffit pas d’invoquer le patriotisme. Un investissement n’est pas un don. La diaspora "
+            "doit pouvoir connaître le porteur du projet, l’utilisation prévue des fonds, les risques, les garanties, la "
+            "gouvernance, les perspectives de rentabilité et les conditions de sortie.\n\n"
+            "> « La confiance ne se décrète pas. Elle se construit par la transparence, la compétence et le respect des engagements. »\n\n"
+            "### Construire une politique publique de mobilisation des compétences\n\n"
+            "Nous avons besoin d’une architecture qui permette d’identifier les compétences de la diaspora et de les "
+            "mettre en relation avec les besoins réels de nos pays. Cette politique pourrait notamment prévoir :\n\n"
+            "- Un **registre volontaire** des compétences et expertises ;\n"
+            "- Un **portefeuille public de projets** structurés et évalués ;\n"
+            "- Des **missions d’expertise** de courte, moyenne ou longue durée ;\n"
+            "- Des **binômes associant systématiquement** experts de la diaspora et professionnels locaux ;\n"
+            "- Des **mécanismes de transfert de compétences** et de formation des équipes ;\n"
+            "- Un **accompagnement des projets de retour** et d’entrepreneuriat ;\n"
+            "- Des **outils financiers sécurisés** et transparents ;\n"
+            "- Une **évaluation indépendante** des projets réalisés.\n\n"
+            "### Organiser la rencontre des deux Afrique\n\n"
+            "La diaspora n’est pas extérieure à l’Afrique. Elle en est une extension humaine, économique, intellectuelle "
+            "et culturelle. Notre défi n’est pas seulement de mobiliser davantage la diaspora. Il est de mieux organiser sa contribution.\n\n"
+            "« L’Afrique ne manque pas de talents. Une partie de ces talents vit sur le continent ; une autre vit ailleurs. "
+            "Le développement exige que ces deux expériences cessent de s’observer à distance et apprennent à construire ensemble. "
+            "Lorsque l’expertise internationale rencontre l’intelligence du terrain, lorsque la générosité s’appuie sur une méthode "
+            "et lorsque la confiance est protégée par des institutions solides, la diaspora cesse d’être seulement une ressource "
+            "extérieure. Elle devient pleinement coproductrice de la transformation africaine. »"
+        ),
+    },
+    {
         "titre": "Forum Régional sur l'Inclusion Financière et la Protection Sociale à Lomé",
         "rubrique_nom": "Événements",
         "a_la_une": False,
