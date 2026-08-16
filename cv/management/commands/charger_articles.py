@@ -39,7 +39,7 @@ ARTICLES = [
         ),
     },
     {
-        "titre": "Diaspora, capital et développement africain : transformer la générosité en partenariat durable",
+        "titre": "Diaspora, capital et développement africain : de Solidar’ Santé à un partenariat durable",
         "rubrique_nom": "Tribunes",
         "a_la_une": False,
         "publie_le": datetime(2026, 2, 10, 10, 0, tzinfo=dt_timezone.utc),
