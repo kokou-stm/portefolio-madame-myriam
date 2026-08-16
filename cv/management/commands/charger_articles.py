@@ -43,8 +43,8 @@ ARTICLES = [
         "rubrique_nom": "Tribunes",
         "a_la_une": False,
         "publie_le": datetime(2026, 2, 10, 10, 0, tzinfo=dt_timezone.utc),
-        "image_path": "img/evenements/conference-ministere.jpg",
-        "image_legende": "Myriam Dossou-D'Almeida lors du sommet international sur le développement et la mobilisation des compétences",
+        "image_path": "img/evenements/diaspora-developpement.png",
+        "image_legende": "Myriam Dossou-D'Almeida — Tribune sur la diaspora, le capital et le développement africain",
         "chapo": (
             "Au-delà des transferts financiers de solidarité, Myriam Dossou d'Almeida plaide pour une "
             "véritable stratégie publique de mobilisation des compétences de la diaspora, de l'épargne "
