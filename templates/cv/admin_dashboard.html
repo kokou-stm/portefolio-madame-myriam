@@ -106,7 +106,7 @@
                       <a href="{% url 'admin_article_modifier' item.pk %}" class="btn-action btn-action--edit">
                         Modifier
                       </a>
-                      <form method="post" action="{% url 'admin_article_supprimer' item.pk %}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûre de vouloir supprimer cette publication ?');">
+                      <form method="post" action="{% url 'admin_article_supprimer' item.pk %}" class="form-delete-item" data-item-title="{{ item.titre }}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
                       </form>
@@ -173,7 +173,7 @@
                     <div class="admin-actions">
                       <a href="{{ vid.youtube_url }}" target="_blank" class="btn-icon" title="Regarder sur YouTube">↗</a>
                       <a href="{% url 'admin_video_modifier' vid.pk %}" class="btn-action btn-action--edit">Modifier</a>
-                      <form method="post" action="{% url 'admin_video_supprimer' vid.pk %}" style="display:inline;" onsubmit="return confirm('Supprimer cette vidéo de la galerie ?');">
+                      <form method="post" action="{% url 'admin_video_supprimer' vid.pk %}" class="form-delete-item" data-item-title="{{ vid.titre }}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
                       </form>
@@ -228,7 +228,7 @@
                   <td class="text-right">
                     <div class="admin-actions">
                       <a href="{% url 'admin_photo_modifier' photo.pk %}" class="btn-action btn-action--edit">Modifier</a>
-                      <form method="post" action="{% url 'admin_photo_supprimer' photo.pk %}" style="display:inline;" onsubmit="return confirm('Supprimer cette photo de la galerie ?');">
+                      <form method="post" action="{% url 'admin_photo_supprimer' photo.pk %}" class="form-delete-item" data-item-title="{{ photo.legende|default:'cette photo' }}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
                       </form>
@@ -273,4 +273,88 @@
 
   </div>
 </section>
+
+<!-- Modal Executive de Confirmation de Suppression -->
+<div class="admin-modal-overlay" id="confirmModalOverlay" hidden>
+  <div class="admin-modal-container" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="admin-modal-header">
+      <div class="admin-modal-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </div>
+      <div>
+        <h3 id="modalTitle" class="admin-modal-title">Confirmer la suppression</h3>
+        <p class="admin-modal-subtitle">Cette action est définitive et ne pourra pas être annulée.</p>
+      </div>
+    </div>
+
+    <div class="admin-modal-body">
+      <p id="modalMessage">Êtes-vous sûre de vouloir supprimer cet élément ?</p>
+    </div>
+
+    <div class="admin-modal-footer">
+      <button type="button" class="btn-action btn-action--outline-dark" id="btnCancelModal">Annuler</button>
+      <button type="button" class="btn-action btn-action--danger-exec" id="btnConfirmDelete">Supprimer définitivement</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var modalOverlay = document.getElementById('confirmModalOverlay');
+    var modalMessage = document.getElementById('modalMessage');
+    var btnCancelModal = document.getElementById('btnCancelModal');
+    var btnConfirmDelete = document.getElementById('btnConfirmDelete');
+    var currentFormToSubmit = null;
+
+    document.querySelectorAll('.form-delete-item').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        currentFormToSubmit = this;
+        var title = this.getAttribute('data-item-title') || 'cet élément';
+        modalMessage.innerHTML = 'Êtes-vous sûre de vouloir supprimer définitivement « <strong>' + title + '</strong> » ?';
+        modalOverlay.removeAttribute('hidden');
+      });
+    });
+
+    function closeModal() {
+      if (modalOverlay) {
+        modalOverlay.setAttribute('hidden', '');
+      }
+      currentFormToSubmit = null;
+    }
+
+    if (btnCancelModal) {
+      btnCancelModal.addEventListener('click', closeModal);
+    }
+
+    if (btnConfirmDelete) {
+      btnConfirmDelete.addEventListener('click', function () {
+        if (currentFormToSubmit) {
+          currentFormToSubmit.submit();
+        }
+      });
+    }
+
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', function (e) {
+        if (e.target === modalOverlay) {
+          closeModal();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modalOverlay && !modalOverlay.hasAttribute('hidden')) {
+        closeModal();
+      }
+    });
+  });
+</script>
 {% endblock %}
