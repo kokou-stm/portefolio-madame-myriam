@@ -19,5 +19,13 @@ urlpatterns = [
     path("espace-admin/publier/", views.admin_article_creer, name="admin_article_creer"),
     path("espace-admin/modifier/<int:pk>/", views.admin_article_modifier, name="admin_article_modifier"),
     path("espace-admin/supprimer/<int:pk>/", views.admin_article_supprimer, name="admin_article_supprimer"),
+    # Gestion des vidéos YouTube
+    path("espace-admin/video/ajouter/", views.admin_video_creer, name="admin_video_creer"),
+    path("espace-admin/video/modifier/<int:pk>/", views.admin_video_modifier, name="admin_video_modifier"),
+    path("espace-admin/video/supprimer/<int:pk>/", views.admin_video_supprimer, name="admin_video_supprimer"),
+    # Gestion des photos de la galerie
+    path("espace-admin/photo/ajouter/", views.admin_photo_creer, name="admin_photo_creer"),
+    path("espace-admin/photo/modifier/<int:pk>/", views.admin_photo_modifier, name="admin_photo_modifier"),
+    path("espace-admin/photo/supprimer/<int:pk>/", views.admin_photo_supprimer, name="admin_photo_supprimer"),
 ]
 

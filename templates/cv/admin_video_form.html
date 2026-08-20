@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ titre_page }} — Espace Administration — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section admin-editor-section">
+  <div class="wrap wrap--narrow">
+
+    <!-- En-tête de l'éditeur -->
+    <div class="admin-editor-header">
+      <div class="admin-editor-header__meta">
+        <a href="{% url 'admin_dashboard' %}" class="admin-back-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Tableau de bord
+        </a>
+        <div class="admin-editor-header__title-group">
+          <h2>{{ titre_page }}</h2>
+        </div>
+      </div>
+    </div>
+
+    {% for message in messages %}
+      <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post" class="admin-editor-form" novalidate>
+      {% csrf_token %}
+
+      <div class="admin-card">
+        <div class="admin-card__header">
+          <h3 class="admin-card__title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M10 15l5-3-5-3v6z"></path></svg>
+            Détails de la Vidéo YouTube
+          </h3>
+        </div>
+        <div class="admin-card__body">
+
+          <!-- Titre de la vidéo -->
+          <div class="form__field">
+            <label for="{{ form.titre.id_for_label }}" class="form-label">
+              {{ form.titre.label }} <span class="req">*</span>
+            </label>
+            {{ form.titre }}
+            {% for erreur in form.titre.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+          </div>
+
+          <!-- Lien YouTube -->
+          <div class="form__field">
+            <label for="{{ form.youtube_url.id_for_label }}" class="form-label">
+              {{ form.youtube_url.label }} <span class="req">*</span>
+            </label>
+            {{ form.youtube_url }}
+            <p class="form-help">Collez l'adresse web complète de la vidéo YouTube (ex: <code>https://www.youtube.com/watch?v=...</code>, <code>https://youtu.be/...</code> ou <code>https://youtube.com/shorts/...</code>).</p>
+            {% for erreur in form.youtube_url.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+          </div>
+
+          <!-- Thématique & Format -->
+          <div class="form__row form__row--2col">
+            <div class="form__field">
+              <label for="{{ form.thematique.id_for_label }}" class="form-label">
+                {{ form.thematique.label }}
+              </label>
+              {{ form.thematique }}
+              {% for erreur in form.thematique.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+            </div>
+
+            <div class="form__field">
+              <label for="{{ form.date.id_for_label }}" class="form-label">
+                {{ form.date.label }}
+              </label>
+              {{ form.date }}
+              {% for erreur in form.date.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+            </div>
+          </div>
+
+          <!-- Format Short & Ordre -->
+          <div class="form__row form__row--2col">
+            <div class="form__field form__field--checkbox">
+              <label class="form-checkbox-label">
+                {{ form.est_short }}
+                <span>Format Short (vidéo verticale 9:16)</span>
+              </label>
+            </div>
+
+            <div class="form__field">
+              <label for="{{ form.ordre.id_for_label }}" class="form-label">
+                Ordre d'affichage
+              </label>
+              {{ form.ordre }}
+            </div>
+          </div>
+
+          <!-- Légende / Description -->
+          <div class="form__field">
+            <label for="{{ form.legende.id_for_label }}" class="form-label">
+              Légende / Description (facultatif)
+            </label>
+            {{ form.legende }}
+            {% for erreur in form.legende.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+          </div>
+
+        </div>
+        <div class="admin-card__footer">
+          <a href="{% url 'admin_dashboard' %}" class="btn btn--outline">Annuler</a>
+          <button type="submit" class="btn btn--primary">{{ bouton_action }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

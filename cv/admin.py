@@ -12,6 +12,7 @@ from .models import (
     Profil,
     Realisation,
     Rubrique,
+    Video,
 )
 
 admin.site.site_header = "Administration du site"
@@ -206,6 +207,18 @@ class PhotoAdmin(admin.ModelAdmin):
                 '<img src="{}" style="height:44px;border-radius:4px">', obj.src
             )
         return "—"
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ("titre", "thematique", "est_short", "date", "ordre")
+    list_editable = ("ordre",)
+    list_filter = ("thematique", "est_short")
+    search_fields = ("titre", "legende", "youtube_url")
+    fieldsets = (
+        (None, {"fields": ("titre", "youtube_url", "thematique", "est_short")}),
+        ("Détails", {"fields": ("date", "legende", "ordre")}),
+    )
 
 
 @admin.register(Message)

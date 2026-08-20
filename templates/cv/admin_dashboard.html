@@ -53,7 +53,7 @@
     <div class="admin-panel">
       <div class="admin-panel__header">
         <h3>Toutes les publications & événements ({{ nb_total }})</h3>
-        <a href="{% url 'admin_article_creer' %}" class="btn btn--dark btn--sm">+ Ajouter</a>
+        <a href="{% url 'admin_article_creer' %}" class="btn btn--dark btn--sm">+ Ajouter une publication</a>
       </div>
 
       {% if articles %}
@@ -121,6 +121,128 @@
         <div class="admin-empty-state">
           <p>Aucune publication pour le moment.</p>
           <a href="{% url 'admin_article_creer' %}" class="btn btn--gold">Créer la première publication</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Section : Vidéos YouTube de la Galerie -->
+    <div class="admin-panel">
+      <div class="admin-panel__header">
+        <h3>🎥 Vidéos YouTube de la Galerie ({{ videos|length }})</h3>
+        <a href="{% url 'admin_video_creer' %}" class="btn btn--gold btn--sm">+ Ajouter une vidéo YouTube</a>
+      </div>
+
+      {% if videos %}
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Aperçu & Titre</th>
+                <th>Thématique</th>
+                <th>Format</th>
+                <th>Date</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for vid in videos %}
+                <tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                      <img src="{{ vid.thumbnail_url }}" alt="{{ vid.titre }}" style="width:64px; height:40px; object-fit:cover; border-radius:4px; flex-shrink:0;">
+                      <div>
+                        <strong>{{ vid.titre }}</strong>
+                        {% if vid.legende %}<br><small class="text-muted">{{ vid.legende|truncatechars:60 }}</small>{% endif %}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge--gold">{{ vid.get_thematique_display }}</span>
+                  </td>
+                  <td>
+                    {% if vid.est_short %}
+                      <span class="badge badge--short">📱 Short</span>
+                    {% else %}
+                      <span class="badge">🎬 Standard</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="admin-date">{{ vid.date|default:"—" }}</span>
+                  </td>
+                  <td class="text-right">
+                    <div class="admin-actions">
+                      <a href="{{ vid.youtube_url }}" target="_blank" class="btn-icon" title="Regarder sur YouTube">↗</a>
+                      <a href="{% url 'admin_video_modifier' vid.pk %}" class="btn-action btn-action--edit">Modifier</a>
+                      <form method="post" action="{% url 'admin_video_supprimer' vid.pk %}" style="display:inline;" onsubmit="return confirm('Supprimer cette vidéo de la galerie ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="admin-empty-state">
+          <p>Aucune vidéo dans la galerie.</p>
+          <a href="{% url 'admin_video_creer' %}" class="btn btn--gold">Ajouter la première vidéo</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Section : Photos de la Galerie -->
+    <div class="admin-panel">
+      <div class="admin-panel__header">
+        <h3>📷 Photos de la Galerie ({{ photos|length }})</h3>
+        <a href="{% url 'admin_photo_creer' %}" class="btn btn--dark btn--sm">+ Ajouter une photo</a>
+      </div>
+
+      {% if photos %}
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Aperçu & Légende</th>
+                <th>Date</th>
+                <th>Crédit</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for photo in photos %}
+                <tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                      {% if photo.src %}
+                        <img src="{{ photo.src }}" alt="{{ photo.legende|default:'Photo' }}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; flex-shrink:0;">
+                      {% endif %}
+                      <div>
+                        <strong>{{ photo.legende|default:"Sans légende" }}</strong>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="admin-date">{{ photo.date|default:"—" }}</span></td>
+                  <td>{{ photo.credit|default:"—" }}</td>
+                  <td class="text-right">
+                    <div class="admin-actions">
+                      <a href="{% url 'admin_photo_modifier' photo.pk %}" class="btn-action btn-action--edit">Modifier</a>
+                      <form method="post" action="{% url 'admin_photo_supprimer' photo.pk %}" style="display:inline;" onsubmit="return confirm('Supprimer cette photo de la galerie ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="admin-empty-state">
+          <p>Aucune photo dans la galerie.</p>
+          <a href="{% url 'admin_photo_creer' %}" class="btn btn--dark">Téléverser une photo</a>
         </div>
       {% endif %}
     </div>

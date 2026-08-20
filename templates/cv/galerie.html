@@ -49,7 +49,7 @@ missions de terrain.{% endblock %}
             <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
           </div>
 
-          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-thumb-url="{{ video.thumbnail_url }}" data-title="{{ video.titre }}">
             <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
             <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
               <svg width="54" height="54" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -89,7 +89,7 @@ missions de terrain.{% endblock %}
             <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
           </div>
 
-          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-thumb-url="{{ video.thumbnail_url }}" data-title="{{ video.titre }}">
             <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
             <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
               <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -124,9 +124,9 @@ missions de terrain.{% endblock %}
     {% endif %}
 
     <!-- Galerie Photos -->
-    <div class="section__head section__head--marge-haute">
-      <h2>Galerie Clichés & Archives</h2>
-      <p class="lede">Photographies de cérémonies, de la vie institutionnelle et des rencontres publiques.</p>
+    <div class="galerie-head" id="photos">
+      <h2>Galerie photos</h2>
+      <p class="lede">Retrouvez les moments forts de l'action publique et de l'engagement terrain en images.</p>
     </div>
 
     <div class="galerie" id="galerie">
@@ -179,9 +179,28 @@ missions de terrain.{% endblock %}
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.video-card__player').forEach(function (player) {
       player.addEventListener('click', function () {
-        var embedUrl = this.getAttribute('data-embed-url');
-        var title = this.getAttribute('data-title');
-        this.innerHTML = '<iframe src="' + embedUrl + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+        // Arrêter toute autre vidéo en cours de lecture
+        document.querySelectorAll('.video-card__player').forEach(function (otherPlayer) {
+          if (otherPlayer !== player && otherPlayer.querySelector('iframe')) {
+            var thumbUrl = otherPlayer.getAttribute('data-thumb-url');
+            var title = otherPlayer.getAttribute('data-title');
+            var isStandard = otherPlayer.closest('.video-card--standard');
+            var btnSize = isStandard ? 60 : 54;
+            otherPlayer.innerHTML = '<img src="' + thumbUrl + '" alt="' + title + '" class="video-card__thumb" loading="lazy">' +
+              '<button class="video-card__play" type="button" aria-label="Lire la vidéo ' + title + '">' +
+              '<svg width="' + btnSize + '" height="' + btnSize + '" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+              '<circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />' +
+              '<polygon points="19,14 34,24 19,34" fill="#d4af37" />' +
+              '</svg></button>';
+          }
+        });
+
+        // Lancer la lecture de la vidéo cliquée si elle n'est pas déjà chargée
+        if (!this.querySelector('iframe')) {
+          var embedUrl = this.getAttribute('data-embed-url');
+          var title = this.getAttribute('data-title');
+          this.innerHTML = '<iframe src="' + embedUrl + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+        }
       });
     });
   });

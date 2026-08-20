@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Article, Message, Rubrique
+from .models import Article, Message, Photo, Rubrique, Video
 
 
 class MessageForm(forms.ModelForm):
@@ -134,5 +134,50 @@ class ArticleForm(forms.ModelForm):
             rubrique_obj, _ = Rubrique.objects.get_or_create(nom=nouvelle.strip())
             self.instance.rubrique = rubrique_obj
         return super().save(commit=commit)
+
+
+class VideoForm(forms.ModelForm):
+    class Meta:
+        model = Video
+        fields = ["titre", "youtube_url", "thematique", "est_short", "date", "legende", "ordre"]
+        widgets = {
+            "titre": forms.TextInput(
+                attrs={"placeholder": "Ex: Intervention à l'Assemblée Nationale", "class": "form-input"}
+            ),
+            "youtube_url": forms.URLInput(
+                attrs={
+                    "placeholder": "Ex: https://www.youtube.com/watch?v=... ou https://youtu.be/... ou https://youtube.com/shorts/...",
+                    "class": "form-input",
+                }
+            ),
+            "thematique": forms.Select(attrs={"class": "form-select"}),
+            "est_short": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+            "date": forms.TextInput(attrs={"placeholder": "Ex: Juin 2024", "class": "form-input"}),
+            "legende": forms.TextInput(
+                attrs={"placeholder": "Description rapide ou résumé de la vidéo...", "class": "form-input"}
+            ),
+            "ordre": forms.NumberInput(attrs={"class": "form-input"}),
+        }
+
+
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ["image", "legende", "date", "credit", "licence", "source_url", "ordre"]
+        widgets = {
+            "legende": forms.TextInput(
+                attrs={"placeholder": "Légende ou lieu de la photo...", "class": "form-input"}
+            ),
+            "date": forms.TextInput(attrs={"placeholder": "Ex: Mai 2024", "class": "form-input"}),
+            "credit": forms.TextInput(
+                attrs={"placeholder": "Ex: Cabinet / Ministère", "class": "form-input"}
+            ),
+            "licence": forms.TextInput(
+                attrs={"placeholder": "Ex: CC BY 4.0", "class": "form-input"}
+            ),
+            "source_url": forms.URLInput(attrs={"placeholder": "https://...", "class": "form-input"}),
+            "ordre": forms.NumberInput(attrs={"class": "form-input"}),
+        }
+
 
 

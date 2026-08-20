@@ -6,7 +6,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .forms import ArticleForm, ConnexionForm, MessageForm
+from .forms import ArticleForm, ConnexionForm, MessageForm, PhotoForm, VideoForm
 from .models import (
     Article,
     Chiffre,
@@ -226,7 +226,9 @@ def deconnexion_admin(request):
 def admin_dashboard(request):
     articles = Article.objects.select_related("rubrique").all()
     messages_recus = Message.objects.all().order_by("-envoye_le")[:10]
-    
+    videos = Video.objects.all()
+    photos = Photo.objects.all()
+
     nb_total = articles.count()
     nb_publies = articles.filter(statut=Article.PUBLIE).count()
     nb_brouillons = articles.filter(statut=Article.BROUILLON).count()
@@ -239,6 +241,8 @@ def admin_dashboard(request):
             "profil": _profil(),
             "articles": articles,
             "messages_recus": messages_recus,
+            "videos": videos,
+            "photos": photos,
             "nb_total": nb_total,
             "nb_publies": nb_publies,
             "nb_brouillons": nb_brouillons,
@@ -256,7 +260,7 @@ def admin_article_creer(request):
             messages.success(
                 request,
                 f"La publication « {article.titre} » a été enregistrée "
-                f"({'Publiée' if article.statut == Article.PUBLIE else 'Brouillon'})."
+                f"({'Publiée' if article.statut == Article.PUBLIE else 'Brouillon'}).",
             )
             return redirect("admin_dashboard")
     else:
@@ -306,6 +310,125 @@ def admin_article_supprimer(request, pk):
         titre = article.titre
         article.delete()
         messages.success(request, f"La publication « {titre} » a été supprimée.")
+    return redirect("admin_dashboard")
+
+
+# --- Gestion des Vidéos YouTube (Espace Admin) ---
+
+@staff_member_required(login_url="connexion_admin")
+def admin_video_creer(request):
+    if request.method == "POST":
+        form = VideoForm(request.POST)
+        if form.is_valid():
+            video = form.save()
+            messages.success(request, f"La vidéo YouTube « {video.titre} » a été ajoutée à la galerie.")
+            return redirect("admin_dashboard")
+    else:
+        form = VideoForm()
+
+    return render(
+        request,
+        "cv/admin_video_form.html",
+        {
+            "profil": _profil(),
+            "form": form,
+            "titre_page": "Ajouter une vidéo YouTube à la galerie",
+            "bouton_action": "Ajouter la vidéo",
+        },
+    )
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_video_modifier(request, pk):
+    video = get_object_or_404(Video, pk=pk)
+    if request.method == "POST":
+        form = VideoForm(request.POST, instance=video)
+        if form.is_valid():
+            video = form.save()
+            messages.success(request, f"La vidéo « {video.titre} » a bien été mise à jour.")
+            return redirect("admin_dashboard")
+    else:
+        form = VideoForm(instance=video)
+
+    return render(
+        request,
+        "cv/admin_video_form.html",
+        {
+            "profil": _profil(),
+            "form": form,
+            "video": video,
+            "titre_page": f"Modifier la vidéo : {video.titre}",
+            "bouton_action": "Enregistrer les modifications",
+        },
+    )
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_video_supprimer(request, pk):
+    video = get_object_or_404(Video, pk=pk)
+    if request.method == "POST":
+        titre = video.titre
+        video.delete()
+        messages.success(request, f"La vidéo « {titre} » a été retirée de la galerie.")
+    return redirect("admin_dashboard")
+
+
+# --- Gestion des Photos de Galerie (Espace Admin) ---
+
+@staff_member_required(login_url="connexion_admin")
+def admin_photo_creer(request):
+    if request.method == "POST":
+        form = PhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "La photo a été ajoutée à la galerie.")
+            return redirect("admin_dashboard")
+    else:
+        form = PhotoForm()
+
+    return render(
+        request,
+        "cv/admin_photo_form.html",
+        {
+            "profil": _profil(),
+            "form": form,
+            "titre_page": "Téléverser / Ajouter une photo",
+            "bouton_action": "Ajouter la photo",
+        },
+    )
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_photo_modifier(request, pk):
+    photo = get_object_or_404(Photo, pk=pk)
+    if request.method == "POST":
+        form = PhotoForm(request.POST, request.FILES, instance=photo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "La photo a bien été mise à jour.")
+            return redirect("admin_dashboard")
+    else:
+        form = PhotoForm(instance=photo)
+
+    return render(
+        request,
+        "cv/admin_photo_form.html",
+        {
+            "profil": _profil(),
+            "form": form,
+            "photo": photo,
+            "titre_page": "Modifier la photo de galerie",
+            "bouton_action": "Enregistrer les modifications",
+        },
+    )
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_photo_supprimer(request, pk):
+    photo = get_object_or_404(Photo, pk=pk)
+    if request.method == "POST":
+        photo.delete()
+        messages.success(request, "La photo a été retirée de la galerie.")
     return redirect("admin_dashboard")
 
 
