@@ -3,8 +3,10 @@ from django.contrib import admin
 from .models import (
     Article,
     Chiffre,
+    CodeSecurite2FA,
     Competence,
     Distinction,
+    EmailAutorise,
     Experience,
     Formation,
     Message,
@@ -219,6 +221,19 @@ class VideoAdmin(admin.ModelAdmin):
         (None, {"fields": ("titre", "youtube_url", "thematique", "est_short")}),
         ("Détails", {"fields": ("date", "legende", "ordre")}),
     )
+
+
+@admin.register(EmailAutorise)
+class EmailAutoriseAdmin(admin.ModelAdmin):
+    list_display = ("email", "nom_utilisateur", "ajoute_le")
+    search_fields = ("email", "nom_utilisateur")
+
+
+@admin.register(CodeSecurite2FA)
+class CodeSecurite2FAAdmin(admin.ModelAdmin):
+    list_display = ("user", "code", "cree_le", "expire_le", "est_utilise")
+    list_filter = ("est_utilise",)
+    search_fields = ("user__email", "user__username", "code")
 
 
 @admin.register(Message)

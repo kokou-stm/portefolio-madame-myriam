@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Article, Message, Photo, Rubrique, Video
+from .models import Article, EmailAutorise, Message, Photo, Rubrique, Video
 
 
 class MessageForm(forms.ModelForm):
@@ -178,6 +178,39 @@ class PhotoForm(forms.ModelForm):
             "source_url": forms.URLInput(attrs={"placeholder": "https://...", "class": "form-input"}),
             "ordre": forms.NumberInput(attrs={"class": "form-input"}),
         }
+
+
+class Code2FAForm(forms.Form):
+    code = forms.CharField(
+        label="Code de sécurité 2FA à 6 chiffres",
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "• • • • • •",
+                "maxlength": "6",
+                "pattern": "[0-9]{6}",
+                "autocomplete": "one-time-code",
+                "autofocus": True,
+                "class": "form-input form-input--code-2fa",
+            }
+        ),
+    )
+
+
+class EmailAutoriseForm(forms.ModelForm):
+    class Meta:
+        model = EmailAutorise
+        fields = ["email", "nom_utilisateur"]
+        widgets = {
+            "email": forms.EmailInput(
+                attrs={"placeholder": "adresse@exemple.com", "class": "form-input"}
+            ),
+            "nom_utilisateur": forms.TextInput(
+                attrs={"placeholder": "Ex: Madame Myriam Dossou, Collaborateur...", "class": "form-input"}
+            ),
+        }
+
 
 
 

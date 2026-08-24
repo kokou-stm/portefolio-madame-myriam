@@ -14,6 +14,7 @@ urlpatterns = [
     path("contact/", views.contact, name="contact"),
     # Espace administration sur-mesure
     path("connexion/", views.connexion_admin, name="connexion_admin"),
+    path("connexion/2fa/", views.connexion_2fa, name="connexion_2fa"),
     path("deconnexion/", views.deconnexion_admin, name="deconnexion_admin"),
     path("espace-admin/", views.admin_dashboard, name="admin_dashboard"),
     path("espace-admin/publier/", views.admin_article_creer, name="admin_article_creer"),
@@ -27,5 +28,8 @@ urlpatterns = [
     path("espace-admin/photo/ajouter/", views.admin_photo_creer, name="admin_photo_creer"),
     path("espace-admin/photo/modifier/<int:pk>/", views.admin_photo_modifier, name="admin_photo_modifier"),
     path("espace-admin/photo/supprimer/<int:pk>/", views.admin_photo_supprimer, name="admin_photo_supprimer"),
+    # Gestion des e-mails autorisés (Whitelist 2FA)
+    path("espace-admin/email-autorise/ajouter/", views.admin_email_autorise_creer, name="admin_email_autorise_creer"),
+    path("espace-admin/email-autorise/supprimer/<int:pk>/", views.admin_email_autorise_supprimer, name="admin_email_autorise_supprimer"),
 ]
 

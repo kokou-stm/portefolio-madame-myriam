@@ -247,6 +247,56 @@
       {% endif %}
     </div>
 
+    <!-- Section : E-mails Autorisés à se connecter (Whitelist 2FA) -->
+    <div class="admin-panel">
+      <div class="admin-panel__header">
+        <h3>🔒 Restriction d'accès & E-mails Autorisés ({{ emails_autorises|length }})</h3>
+        <a href="{% url 'admin_email_autorise_creer' %}" class="btn btn--gold btn--sm">+ Autoriser une adresse e-mail</a>
+      </div>
+
+      {% if emails_autorises %}
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Adresse E-mail autorisée</th>
+                <th>Titulaire / Titre</th>
+                <th>Date d'autorisation</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for em in emails_autorises %}
+                <tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:0.6rem;">
+                      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a;"></span>
+                      <strong>{{ em.email }}</strong>
+                    </div>
+                  </td>
+                  <td>{{ em.nom_utilisateur|default:"—" }}</td>
+                  <td><span class="admin-date">{{ em.ajoute_le|date:"d/m/Y à H:i" }}</span></td>
+                  <td class="text-right">
+                    <div class="admin-actions">
+                      <form method="post" action="{% url 'admin_email_autorise_supprimer' em.pk %}" class="form-delete-item" data-item-title="l'accès 2FA pour {{ em.email }}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action btn-action--delete">Retirer l'accès</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="admin-empty-state">
+          <p>Aucune adresse e-mail dans la Whitelist.</p>
+          <a href="{% url 'admin_email_autorise_creer' %}" class="btn btn--gold">Autoriser la première adresse</a>
+        </div>
+      {% endif %}
+    </div>
+
     <!-- Section Messages du formulaire de contact -->
     {% if messages_recus %}
       <div class="admin-panel admin-panel--secondary">

@@ -573,3 +573,38 @@ class Video(models.Model):
     def thumbnail_url(self):
         return f"https://i.ytimg.com/vi/{self.youtube_id}/hqdefault.jpg"
 
+
+class EmailAutorise(models.Model):
+    """Adresse e-mail autorisée à se connecter à l'Espace Administration."""
+
+    email = models.EmailField("Adresse e-mail autorisée", unique=True)
+    nom_utilisateur = models.CharField("Nom / Titulaire", max_length=120, blank=True)
+    ajoute_le = models.DateTimeField("Ajouté le", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "E-mail autorisé"
+        verbose_name_plural = "E-mails autorisés (Whitelist 2FA)"
+        ordering = ["email"]
+
+    def __str__(self):
+        return self.email
+
+
+class CodeSecurite2FA(models.Model):
+    """Code 2FA temporaire généré lors de la connexion."""
+
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    code = models.CharField("Code à 6 chiffres", max_length=6)
+    cree_le = models.DateTimeField("Créé le", auto_now_add=True)
+    expire_le = models.DateTimeField("Expire le")
+    est_utilise = models.BooleanField("Est utilisé", default=False)
+
+    class Meta:
+        verbose_name = "Code 2FA"
+        verbose_name_plural = "Codes 2FA"
+        ordering = ["-cree_le"]
+
+    def est_valide(self):
+        return not self.est_utilise and timezone.now() < self.expire_le
+
+

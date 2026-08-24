@@ -1,17 +1,30 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db import models
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
-from .forms import ArticleForm, ConnexionForm, MessageForm, PhotoForm, VideoForm
+from .forms import (
+    ArticleForm,
+    Code2FAForm,
+    ConnexionForm,
+    EmailAutoriseForm,
+    MessageForm,
+    PhotoForm,
+    VideoForm,
+)
 from .models import (
     Article,
     Chiffre,
+    CodeSecurite2FA,
     Competence,
     Distinction,
+    EmailAutorise,
     Experience,
     Formation,
     Message,
@@ -201,19 +214,101 @@ def connexion_admin(request):
     if request.method == "POST":
         form = ConnexionForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data["username"]
+            saisie = form.cleaned_data["username"].strip()
             password = form.cleaned_data["password"]
-            user = authenticate(request, username=username, password=password)
+
+            # 1. Vérification si l'email ou l'identifiant est dans la Whitelist EmailAutorise
+            email_autorise = EmailAutorise.objects.filter(models.Q(email__iexact=saisie) | models.Q(nom_utilisateur__icontains=saisie)).first()
+            if not email_autorise:
+                user_found = User.objects.filter(models.Q(username__iexact=saisie) | models.Q(email__iexact=saisie)).first()
+                if user_found and user_found.email:
+                    email_autorise = EmailAutorise.objects.filter(email__iexact=user_found.email).first()
+
+            if not email_autorise:
+                messages.error(
+                    request,
+                    f"Accès refusé : L'adresse e-mail « {saisie} » n'est pas autorisée à se connecter."
+                )
+                return render(request, "cv/connexion.html", {"profil": _profil(), "form": form})
+
+            # 2. Authentification par mot de passe
+            user = authenticate(request, username=saisie, password=password)
+            if user is None:
+                user_obj = User.objects.filter(models.Q(email__iexact=saisie) | models.Q(username__iexact=saisie)).first()
+                if user_obj:
+                    user = authenticate(request, username=user_obj.username, password=password)
+
             if user is not None and user.is_staff:
-                login(request, user)
-                messages.success(request, f"Bienvenue {user.first_name or user.username} dans votre espace d'administration.")
-                return redirect("admin_dashboard")
+                # 3. Génération du code 2FA à 6 chiffres
+                import random
+                code_digits = f"{random.randint(100000, 999999)}"
+                expire_dt = timezone.now() + timezone.timedelta(minutes=10)
+
+                code_obj = CodeSecurite2FA.objects.create(
+                    user=user,
+                    code=code_digits,
+                    expire_le=expire_dt
+                )
+
+                request.session["pending_2fa_user_id"] = user.id
+                request.session["pending_2fa_code_id"] = code_obj.id
+
+                return redirect("connexion_2fa")
             else:
-                messages.error(request, "Identifiants incorrects ou accès non autorisé.")
+                messages.error(request, "Mot de passe incorrect ou accès non autorisé.")
     else:
         form = ConnexionForm()
 
     return render(request, "cv/connexion.html", {"profil": _profil(), "form": form})
+
+
+def connexion_2fa(request):
+    user_id = request.session.get("pending_2fa_user_id")
+    code_id = request.session.get("pending_2fa_code_id")
+
+    if not user_id or not code_id:
+        messages.error(request, "Session 2FA expirée. Veuillez recommencer la connexion.")
+        return redirect("connexion_admin")
+
+    user = get_object_or_404(User, pk=user_id)
+    code_obj = get_object_or_404(CodeSecurite2FA, pk=code_id, user=user)
+
+    if not code_obj.est_valide():
+        messages.error(request, "Le code de sécurité a expiré (durée 10 min). Veuillez vous reconnecter.")
+        return redirect("connexion_admin")
+
+    if request.method == "POST":
+        form = Code2FAForm(request.POST)
+        if form.is_valid():
+            code_saisi = form.cleaned_data["code"].strip()
+            if code_saisi == code_obj.code:
+                code_obj.est_utilise = True
+                code_obj.save()
+
+                login(request, user)
+                request.session.pop("pending_2fa_user_id", None)
+                request.session.pop("pending_2fa_code_id", None)
+
+                messages.success(
+                    request,
+                    f"Authentification 2FA réussie ! Bienvenue {user.first_name or user.username} dans votre espace d'administration."
+                )
+                return redirect("admin_dashboard")
+            else:
+                messages.error(request, "Code de sécurité à 6 chiffres incorrect.")
+    else:
+        form = Code2FAForm()
+
+    return render(
+        request,
+        "cv/connexion_2fa.html",
+        {
+            "profil": _profil(),
+            "form": form,
+            "user_email": user.email or user.username,
+            "active_code": code_obj.code,
+        },
+    )
 
 
 def deconnexion_admin(request):
@@ -228,6 +323,7 @@ def admin_dashboard(request):
     messages_recus = Message.objects.all().order_by("-envoye_le")[:10]
     videos = Video.objects.all()
     photos = Photo.objects.all()
+    emails_autorises = EmailAutorise.objects.all()
 
     nb_total = articles.count()
     nb_publies = articles.filter(statut=Article.PUBLIE).count()
@@ -243,12 +339,64 @@ def admin_dashboard(request):
             "messages_recus": messages_recus,
             "videos": videos,
             "photos": photos,
+            "emails_autorises": emails_autorises,
             "nb_total": nb_total,
             "nb_publies": nb_publies,
             "nb_brouillons": nb_brouillons,
             "nb_messages": nb_messages,
         },
     )
+
+
+# --- Gestion des E-mails Autorisés (Whitelist 2FA) ---
+
+@staff_member_required(login_url="connexion_admin")
+def admin_email_autorise_creer(request):
+    if request.method == "POST":
+        form = EmailAutoriseForm(request.POST)
+        if form.is_valid():
+            email_obj = form.save()
+            email_str = email_obj.email.strip().lower()
+
+            # S'assurer que le User correspondant existe et est staff
+            user_obj = User.objects.filter(models.Q(email__iexact=email_str) | models.Q(username__iexact=email_str)).first()
+            if not user_obj:
+                user_obj = User.objects.create_user(
+                    username=email_str,
+                    email=email_str,
+                    password="Password123!",
+                    is_staff=True,
+                    first_name=email_obj.nom_utilisateur or email_str.split("@")[0]
+                )
+            else:
+                user_obj.is_staff = True
+                user_obj.save()
+
+            messages.success(request, f"L'adresse e-mail « {email_str} » a été ajoutée aux autorisations 2FA.")
+            return redirect("admin_dashboard")
+    else:
+        form = EmailAutoriseForm()
+
+    return render(
+        request,
+        "cv/admin_email_autorise_form.html",
+        {
+            "profil": _profil(),
+            "form": form,
+            "titre_page": "Autoriser un nouvel e-mail (Whitelist 2FA)",
+            "bouton_action": "Autoriser l'accès",
+        },
+    )
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_email_autorise_supprimer(request, pk):
+    email_obj = get_object_or_404(EmailAutorise, pk=pk)
+    if request.method == "POST":
+        email_str = email_obj.email
+        email_obj.delete()
+        messages.success(request, f"L'adresse e-mail « {email_str} » a été retirée des accès autorisés.")
+    return redirect("admin_dashboard")
 
 
 @staff_member_required(login_url="connexion_admin")

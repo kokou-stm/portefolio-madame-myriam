@@ -3991,9 +3991,60 @@ img {
   border-color: #94a3b8;
 }
 
+/* ==========================================================================
+   STYLE COMPOSANTS 2FA DOUBLE FACTEUR & WHITELIST
+   ========================================================================== */
 
+.code-2fa-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 1px solid rgba(197, 155, 39, 0.4);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1.25rem 2rem 0;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+}
 
+.code-2fa-banner__label {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
+}
 
+.code-2fa-banner__valeur {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--gold, #c59b27);
+  letter-spacing: 0.25em;
+  font-family: monospace;
+}
 
+.code-2fa-banner__timer {
+  display: block;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  margin-top: 0.35rem;
+}
 
+.form-input--code-2fa {
+  font-size: 1.8rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3em !important;
+  text-align: center !important;
+  height: 58px !important;
+  border-color: var(--gold, #c59b27) !important;
+  background: #f8fafc !important;
+}
 
+.admin-login-footer {
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #64748b;
+}

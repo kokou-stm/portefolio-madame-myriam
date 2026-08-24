@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Vérification 2FA — {{ profil.nom }}{% endblock %}
+
+{% block contenu %}
+<section class="section admin-login-section">
+  <div class="wrap wrap--narrow">
+
+    <div class="admin-login-back">
+      <a href="{% url 'connexion_admin' %}" class="admin-back-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Recommencer la connexion
+      </a>
+    </div>
+
+    <div class="admin-login-card">
+      <div class="admin-login-card__top-bar"></div>
+
+      <div class="admin-login-card__header">
+        <div class="admin-login-badge" style="background: rgba(22, 163, 74, 0.12); color: #16a34a;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          SÉCURITÉ DOUBLE FACTEUR (2FA)
+        </div>
+
+        <div class="admin-login-avatar">
+          <img src="{% if profil.photo %}{{ profil.photo.url }}{% else %}{% static 'img/myriam-dossou-medaillon.png' %}{% endif %}" alt="Portrait de {{ profil.nom }}">
+        </div>
+
+        <h2>Vérification 2FA</h2>
+        <p class="admin-login-subtitle">
+          Un code de sécurité temporaire à 6 chiffres a été généré pour <strong>{{ user_email }}</strong>.
+        </p>
+      </div>
+
+      {% for message in messages %}
+        <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+
+      <!-- Bannière d'affichage dynamique du code 2FA -->
+      <div class="code-2fa-banner">
+        <span class="code-2fa-banner__label">🔒 Votre Code de Sécurité 2FA :</span>
+        <strong class="code-2fa-banner__valeur">{{ active_code }}</strong>
+        <span class="code-2fa-banner__timer">Valable pendant 10 minutes</span>
+      </div>
+
+      <form method="post" class="admin-login-form" novalidate>
+        {% csrf_token %}
+
+        <div class="form__field" style="text-align: center; margin-top: 1.5rem;">
+          <label for="{{ form.code.id_for_label }}" class="form-label" style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #475569;">
+            Saisissez le code à 6 chiffres
+          </label>
+          <div class="input-with-icon" style="max-width: 260px; margin: 0.5rem auto 0;">
+            {{ form.code }}
+          </div>
+          {% for erreur in form.code.errors %}<p class="erreur" style="text-align: center; margin-top: 0.5rem;">{{ erreur }}</p>{% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn--gold btn--full" style="margin-top: 1.75rem; height: 50px; font-size: 1.05rem; font-weight: 700;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Valider et Accéder à l'Admin
+        </button>
+      </form>
+
+      <div class="admin-login-footer">
+        <p>🔒 Accès restreint uniquement aux e-mails autorisés dans la Whitelist.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
