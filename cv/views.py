@@ -250,6 +250,27 @@ def connexion_admin(request):
                     expire_le=expire_dt
                 )
 
+                # Tentative d'envoi d'e-mail automatique du code 2FA
+                try:
+                    from django.core.mail import send_mail
+                    dest_email = user.email or user.username
+                    send_mail(
+                        subject="[2FA] Votre code de sécurité — Administration Myriam Dossou d'Almeida",
+                        message=(
+                            f"Bonjour,\n\n"
+                            f"Voici votre code de sécurité 2FA pour vous connecter à l'Espace Administration : {code_digits}\n\n"
+                            f"Ce code est à usage unique et expire dans 10 minutes.\n\n"
+                            f"Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.\n\n"
+                            f"Cordialement,\n"
+                            f"Cabinet Myriam Dossou d'Almeida"
+                        ),
+                        from_email=None,
+                        recipient_list=[dest_email],
+                        fail_silently=True,
+                    )
+                except Exception:
+                    pass
+
                 request.session["pending_2fa_user_id"] = user.id
                 request.session["pending_2fa_code_id"] = code_obj.id
 
