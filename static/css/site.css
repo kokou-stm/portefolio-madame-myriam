@@ -4048,3 +4048,49 @@ img {
   font-size: 0.8rem;
   color: #64748b;
 }
+
+/* ==========================================================================
+   STYLE DES BOUTONS EXECUTIVE (CONNEXION & 2FA)
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.btn--full {
+  width: 100%;
+}
+
+.btn--gold,
+.btn--primary {
+  background: linear-gradient(135deg, #c59b27 0%, #a37d18 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 6px 20px rgba(197, 155, 39, 0.35) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn--gold:hover,
+.btn--primary:hover {
+  background: linear-gradient(135deg, #d4a933 0%, #b88d20 100%) !important;
+  box-shadow: 0 8px 25px rgba(197, 155, 39, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.btn--gold:active,
+.btn--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(197, 155, 39, 0.3) !important;
+}
