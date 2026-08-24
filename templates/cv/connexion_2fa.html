@@ -29,7 +29,7 @@
 
         <h2>Vérification 2FA</h2>
         <p class="admin-login-subtitle">
-          Un code de sécurité temporaire à 6 chiffres a été généré pour <strong>{{ user_email }}</strong>.
+          Un code de sécurité à 6 chiffres vient d'être envoyé par e-mail à <strong>{{ user_email }}</strong>.
         </p>
       </div>
 
@@ -37,11 +37,11 @@
         <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
       {% endfor %}
 
-      <!-- Bannière d'affichage dynamique du code 2FA -->
-      <div class="code-2fa-banner">
-        <span class="code-2fa-banner__label">🔒 Votre Code de Sécurité 2FA :</span>
-        <strong class="code-2fa-banner__valeur">{{ active_code }}</strong>
-        <span class="code-2fa-banner__timer">Valable pendant 10 minutes</span>
+      <div class="code-2fa-info-box" style="background: rgba(15, 23, 42, 0.04); border: 1px dashed #cbd5e1; border-radius: 10px; padding: 1.1rem; margin: 1.25rem 2rem 0; text-align: center;">
+        <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.5;">
+          ✉️ <strong>Consultez votre boîte e-mail</strong> pour récupérer le code à 6 chiffres.<br>
+          <small class="text-muted">Si vous ne le trouvez pas, vérifiez votre dossier Spams / Indésirables. Le code reste valide pendant 10 minutes.</small>
+        </p>
       </div>
 
       <form method="post" class="admin-login-form" novalidate>
