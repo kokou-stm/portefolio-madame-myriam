@@ -364,7 +364,7 @@ def admin_email_autorise_creer(request):
                 user_obj = User.objects.create_user(
                     username=email_str,
                     email=email_str,
-                    password="Password123!",
+                    password="Myd#urHt%H^PAtEuzF!G",
                     is_staff=True,
                     first_name=email_obj.nom_utilisateur or email_str.split("@")[0]
                 )
