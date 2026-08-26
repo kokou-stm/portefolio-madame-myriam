@@ -39,6 +39,33 @@ class Command(BaseCommand):
             return
 
         Utilisateur = get_user_model()
+
+        # Amorçage de la Whitelist 2FA et des comptes autorisés
+        from cv.models import EmailAutorise
+        emails_defaut = [
+            ("myriam.dossou@yahoo.fr", "Myriam DOSSOU-D’ALMEIDA"),
+            ("sekpona30@gmail.com", "Sekpona KOKOU"),
+            ("fabricesassou@gmail.com", "Fabrice SASSOU"),
+            ("contact@myriamdossou.com", "Cabinet Officiel"),
+        ]
+        for em_str, nom in emails_defaut:
+            EmailAutorise.objects.get_or_create(email=em_str, defaults={"nom_utilisateur": nom})
+            u = Utilisateur.objects.filter(email__iexact=em_str).first()
+            if not u:
+                u = Utilisateur.objects.filter(username__iexact=em_str).first()
+            if not u:
+                Utilisateur.objects.create_user(
+                    username=em_str,
+                    email=em_str,
+                    password="Myd#urHt%H^PAtEuzF!G",
+                    is_staff=True,
+                    first_name=nom.split()[0],
+                    last_name=" ".join(nom.split()[1:]) if len(nom.split()) > 1 else "",
+                )
+            else:
+                u.is_staff = True
+                u.save()
+
         if Utilisateur.objects.filter(username=identifiant).exists():
             # Le mot de passe a pu être changé depuis l'admin : on n'y touche pas.
             self.stdout.write(f"Le compte « {identifiant} » existe déjà.")
