@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Galerie & Visiothèque — {{ profil.nom }}{% endblock %}
-{% block description %}Galerie vidéo et photo de {{ profil.nom }} : interventions parlementaires, protection sociale et
+{% block title %}Galerie & Visiothèque — {{ profil.nom|default:"Myriam Dossou d'Almeida" }}{% endblock %}
+{% block description %}Galerie vidéo et photo de {{ profil.nom|default:"Myriam Dossou d'Almeida" }} : interventions parlementaires, protection sociale et
 missions de terrain.{% endblock %}
 
 {% block contenu %}
@@ -22,8 +22,7 @@ missions de terrain.{% endblock %}
     <div class="section__head">
       <p class="eyebrow">Galerie & Visiothèque</p>
       <h2>Interventions et moments forts en vidéo</h2>
-      <p class="lede">Retrouvez les prises de parole, déclarations officielles et reportages de terrain de {{ profil.nom
-        }}, classés par thématique.</p>
+      <p class="lede">Retrouvez les prises de parole, déclarations officielles et reportages de terrain de {{ profil.nom|default:"Myriam Dossou d'Almeida" }}, classés par thématique.</p>
     </div>
 
     <!-- Onglets de filtres par thématique -->
@@ -154,7 +153,6 @@ missions de terrain.{% endblock %}
     {% if photos %}
     <p class="note-sources">
       Les photos disponibles sous licence libre sont créditées à leur auteur.
-      
     </p>
     {% endif %}
   </div>
