@@ -45,9 +45,28 @@ PHOTOS = [
 class Command(BaseCommand):
     help = "Charge les photos de galerie sous licence libre (Wikimedia Commons)."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help=(
+                "DESTRUCTIF : supprime les photos livrées avant rechargement, "
+                "y compris leurs légendes corrigées depuis l'administration."
+            ),
+        )
+
     def handle(self, *args, **options):
-        # Repérage par fichier livré : idempotent, ne touche pas aux photos
-        # ajoutées depuis l'administration.
+        # L'administration fait foi : amorçage de base vierge uniquement.
+        livrees = Photo.objects.filter(fichier_statique__gt="")
+        if options["reset"]:
+            supprimes, _ = livrees.delete()
+            self.stdout.write(self.style.WARNING(f"--reset : {supprimes} objets supprimés."))
+        elif Photo.objects.exists():
+            self.stdout.write(
+                f"{Photo.objects.count()} photos déjà en base : amorçage ignoré."
+            )
+            return
+
         for i, donnees in enumerate(PHOTOS):
             Photo.objects.update_or_create(
                 fichier_statique=donnees["fichier_statique"],

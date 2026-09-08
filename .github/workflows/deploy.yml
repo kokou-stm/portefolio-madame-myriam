@@ -63,12 +63,14 @@ jobs:
               PORT=80 \
               DJANGO_DEBUG=0 \
               DJANGO_HTTPS=0 \
-              DJANGO_ALLOWED_HOSTS="myriam-dossou.francecentral.azurecontainer.io,myriamdossou.com,www.myriamdossou.com,*" \
+              DJANGO_ALLOWED_HOSTS="myriam-dossou.francecentral.azurecontainer.io,myriamdossou.com,www.myriamdossou.com" \
               DJANGO_CSRF_TRUSTED_ORIGINS="https://myriamdossou.com,https://www.myriamdossou.com,http://myriamdossou.com,http://www.myriamdossou.com,http://myriam-dossou.francecentral.azurecontainer.io" \
               DJANGO_DATA_DIR="/home/data" \
             --secure-environment-variables \
               DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-              DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}"
+              DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" \
+              EMAIL_HOST_USER="${{ secrets.EMAIL_HOST_USER }}" \
+              EMAIL_HOST_PASSWORD="${{ secrets.EMAIL_HOST_PASSWORD }}"
 
       - name: Verify Live Deployment
         run: |

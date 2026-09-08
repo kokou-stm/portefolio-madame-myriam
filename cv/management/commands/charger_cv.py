@@ -250,39 +250,59 @@ DISTINCTIONS = [
 class Command(BaseCommand):
     help = "Charge le contenu initial du site à partir du CV."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help=(
+                "DESTRUCTIF : vide les tables du CV (chiffres, compétences, "
+                "expériences, formations, distinctions) avant rechargement, "
+                "y compris les entrées saisies depuis l'administration."
+            ),
+        )
+
+    def _amorcer(self, modele, reset, objets):
+        """Amorce une table sans jamais écraser un contenu déjà saisi.
+
+        Ces tables n'ont pas de clé naturelle permettant un update_or_create :
+        sans --reset, une table déjà remplie est donc laissée telle quelle.
+        """
+        if reset:
+            modele.objects.all().delete()
+        elif modele.objects.exists():
+            return
+        modele.objects.bulk_create(objets)
+
     def handle(self, *args, **options):
+        reset = options["reset"]
+
         profil, _ = Profil.objects.update_or_create(
             pk=Profil.objects.values_list("pk", flat=True).first() or 1,
             defaults=PROFIL,
         )
 
-        Chiffre.objects.all().delete()
-        Chiffre.objects.bulk_create(
+        self._amorcer(Chiffre, reset, (
             Chiffre(valeur=v, libelle=l, ordre=i)
             for i, (v, l) in enumerate(CHIFFRES)
-        )
+        ))
 
-        Competence.objects.all().delete()
-        Competence.objects.bulk_create(
+        self._amorcer(Competence, reset, (
             Competence(intitule=t, description=d, icone=ic, ordre=i)
             for i, (t, d, ic) in enumerate(COMPETENCES)
-        )
+        ))
 
-        Experience.objects.all().delete()
-        Experience.objects.bulk_create(
+        self._amorcer(Experience, reset, (
             Experience(ordre=i, **donnees) for i, donnees in enumerate(EXPERIENCES)
-        )
+        ))
 
-        Formation.objects.all().delete()
-        Formation.objects.bulk_create(
+        self._amorcer(Formation, reset, (
             Formation(annee=a, intitule=i_, etablissement=e, mention=m, ordre=idx)
             for idx, (a, i_, e, m) in enumerate(FORMATIONS)
-        )
+        ))
 
-        Distinction.objects.all().delete()
-        Distinction.objects.bulk_create(
+        self._amorcer(Distinction, reset, (
             Distinction(ordre=i, **d) for i, d in enumerate(DISTINCTIONS)
-        )
+        ))
 
         for r_nom in ["Événements", "Actualités", "Tribunes", "Discours", "Presse"]:
             Rubrique.objects.get_or_create(nom=r_nom)

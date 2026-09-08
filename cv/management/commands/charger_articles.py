@@ -237,8 +237,30 @@ ARTICLES = [
 class Command(BaseCommand):
     help = "Charge des articles et tribunes dans la section Actualités."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help=(
+                "DESTRUCTIF : supprime tous les articles avant rechargement, "
+                "y compris ceux rédigés depuis l'administration."
+            ),
+        )
+
     def handle(self, *args, **options):
-        Article.objects.all().delete()
+        # L'administration fait foi : ces articles ne sont qu'un amorçage de
+        # base vierge. Dès qu'un article existe, la commande ne touche plus à
+        # rien — ni réécriture d'un texte corrigé en ligne, ni résurrection
+        # d'un article supprimé depuis l'administration.
+        if options["reset"]:
+            supprimes, _ = Article.objects.all().delete()
+            self.stdout.write(self.style.WARNING(f"--reset : {supprimes} objets supprimés."))
+        elif Article.objects.exists():
+            self.stdout.write(
+                f"{Article.objects.count()} articles déjà en base : amorçage ignoré."
+            )
+            return
+
         compteur = 0
         for i, donnees in enumerate(ARTICLES):
             rubrique, _ = Rubrique.objects.get_or_create(nom=donnees["rubrique_nom"])

@@ -107,10 +107,32 @@ VIDEOS = [
 class Command(BaseCommand):
     help = "Charge les 10 vidéos YouTube classées par thématique."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help=(
+                "DESTRUCTIF : supprime toutes les vidéos avant rechargement, "
+                "y compris celles ajoutées depuis l'administration."
+            ),
+        )
+
     def handle(self, *args, **options):
-        Video.objects.all().delete()
+        # L'administration fait foi : amorçage de base vierge uniquement.
+        if options["reset"]:
+            supprimes, _ = Video.objects.all().delete()
+            self.stdout.write(self.style.WARNING(f"--reset : {supprimes} objets supprimés."))
+        elif Video.objects.exists():
+            self.stdout.write(
+                f"{Video.objects.count()} vidéos déjà en base : amorçage ignoré."
+            )
+            return
+
         for i, donnees in enumerate(VIDEOS):
-            Video.objects.create(**donnees, ordre=i)
+            Video.objects.update_or_create(
+                youtube_url=donnees["youtube_url"],
+                defaults={**donnees, "ordre": i},
+            )
 
         self.stdout.write(
             self.style.SUCCESS(f"{Video.objects.count()} vidéos chargées avec succès.")

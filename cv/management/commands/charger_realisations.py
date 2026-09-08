@@ -111,10 +111,32 @@ REALISATIONS = [
 class Command(BaseCommand):
     help = "Charge les 6 réalisations concrètes du parcours."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help=(
+                "DESTRUCTIF : supprime toutes les réalisations avant rechargement, "
+                "y compris celles saisies depuis l'administration."
+            ),
+        )
+
     def handle(self, *args, **options):
-        Realisation.objects.all().delete()
+        # L'administration fait foi : amorçage de base vierge uniquement.
+        if options["reset"]:
+            supprimes, _ = Realisation.objects.all().delete()
+            self.stdout.write(self.style.WARNING(f"--reset : {supprimes} objets supprimés."))
+        elif Realisation.objects.exists():
+            self.stdout.write(
+                f"{Realisation.objects.count()} réalisations déjà en base : amorçage ignoré."
+            )
+            return
+
         for i, donnees in enumerate(REALISATIONS):
-            Realisation.objects.create(**donnees, ordre=i)
+            Realisation.objects.update_or_create(
+                titre=donnees["titre"],
+                defaults={**donnees, "ordre": i},
+            )
 
         self.stdout.write(
             self.style.SUCCESS(
