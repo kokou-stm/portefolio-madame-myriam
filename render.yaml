@@ -1,0 +1,59 @@
+# Blueprint Render — Portfolio Myriam Dossou d'Almeida
+# Déploiements parallèles conservés : Azure (.github/workflows/deploy.yml) et
+# Google Cloud Run (deploy/cloudrun/). Render réutilise le Dockerfile et le
+# startup.sh racine sans modification : migrations, amorçage idempotent puis
+# Gunicorn sur le port $PORT fourni par Render.
+services:
+  - type: web
+    name: portfolio-myriam
+    runtime: docker
+    # Starter minimum : le plan gratuit met le site en veille après 15 min
+    # d'inactivité et n'accepte pas de disque persistant.
+    plan: starter
+    region: frankfurt
+    branch: master
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    # Médias téléversés depuis l'administration : conservés entre les
+    # déploiements. MEDIA_ROOT = DJANGO_DATA_DIR/media.
+    disk:
+      name: portfolio-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "0"
+      # Render termine le TLS et transmet X-Forwarded-Proto : le durcissement
+      # HTTPS (cookies Secure, redirection, HSTS) peut être actif.
+      - key: DJANGO_HTTPS
+        value: "1"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com,myriamdossou.com,www.myriamdossou.com"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com,https://myriamdossou.com,https://www.myriamdossou.com"
+      - key: DJANGO_DATA_DIR
+        value: /var/data
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      # Base Render, jointe par le réseau interne.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: portfolio-db
+          property: connectionString
+      - key: DATABASE_SSL_REQUIRE
+        value: "0"
+      # Secrets saisis dans le tableau de bord Render à la création du
+      # Blueprint (sync: false = jamais stockés dans ce fichier).
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+
+databases:
+  - name: portfolio-db
+    plan: basic-256mb
+    region: frankfurt
+    postgresMajorVersion: "16"
+    databaseName: portfolio
+    user: portfolio

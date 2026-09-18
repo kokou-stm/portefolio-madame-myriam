@@ -1,0 +1,59 @@
+# VPS OVHcloud — Portfolio Myriam Dossou d'Almeida
+# Trois conteneurs sur une même machine :
+#   caddy : HTTPS automatique (Let's Encrypt) et relais vers le site
+#   web   : Django, construit avec le Dockerfile et le startup.sh racine
+#   db    : PostgreSQL 16, jamais exposé sur Internet
+# Lancement, depuis ce dossier : docker compose up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      # Réseau interne Docker : PostgreSQL n'y active pas SSL.
+      DATABASE_SSL_REQUIRE: "0"
+      DJANGO_DATA_DIR: /data
+      PORT: "8000"
+    volumes:
+      # Médias téléversés depuis l'administration (MEDIA_ROOT = /data/media).
+      - medias:/data
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
+  medias:
+  caddy_data:
+  caddy_config:

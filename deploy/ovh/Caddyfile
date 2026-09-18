@@ -1,0 +1,6 @@
+# Caddy obtient et renouvelle seul les certificats HTTPS (Let's Encrypt),
+# et transmet X-Forwarded-Proto à Django (DJANGO_HTTPS=1).
+myriamdossou.com, www.myriamdossou.com {
+	encode gzip
+	reverse_proxy web:8000
+}

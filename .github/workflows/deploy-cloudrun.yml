@@ -1,0 +1,85 @@
+name: Deploy Portfolio to Google Cloud Run
+
+# Déclenchement manuel uniquement : le déploiement Azure (deploy.yml) reste
+# celui qui part à chaque push. Onglet Actions → « Run workflow ».
+on:
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: project-03951071-0256-4496-8a1
+  REGION: europe-west1
+  SERVICE: portfolio
+  JOB: portfolio-migrate
+  REPOSITORY: portfolio
+  RUNTIME_SA: portfolio-run@project-03951071-0256-4496-8a1.iam.gserviceaccount.com
+  SECRETS: >-
+    DATABASE_URL=portfolio-database-url:latest,DJANGO_SECRET_KEY=portfolio-django-secret-key:latest,EMAIL_HOST_USER=portfolio-email-host-user:latest,EMAIL_HOST_PASSWORD=portfolio-email-host-password:latest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # jeton OIDC pour Workload Identity Federation
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Aucune clé de compte de service stockée dans GitHub : GitHub prouve son
+      # identité à Google par OIDC, limité à ce dépôt (voir setup-gcp.sh).
+      - name: Google Cloud Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build & Push Image to Artifact Registry
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:${GITHUB_SHA}"
+          echo "IMAGE=${IMAGE}" >> "$GITHUB_ENV"
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker build -f deploy/cloudrun/Dockerfile -t "${IMAGE}" .
+          docker push "${IMAGE}"
+
+      # Migrations et amorçage une seule fois, avant de basculer le trafic.
+      - name: Run migrations job
+        run: |
+          gcloud run jobs deploy "${JOB}" \
+            --project "${PROJECT_ID}" --region "${REGION}" \
+            --image "${IMAGE}" \
+            --command deploy/cloudrun/migrate.sh \
+            --service-account "${RUNTIME_SA}" \
+            --env-vars-file deploy/cloudrun/env.yaml \
+            --set-secrets "${SECRETS}" \
+            --max-retries 0 \
+            --task-timeout 10m
+          gcloud run jobs execute "${JOB}" \
+            --project "${PROJECT_ID}" --region "${REGION}" --wait
+
+      - name: Deploy service
+        run: |
+          gcloud run deploy "${SERVICE}" \
+            --project "${PROJECT_ID}" --region "${REGION}" \
+            --image "${IMAGE}" \
+            --service-account "${RUNTIME_SA}" \
+            --env-vars-file deploy/cloudrun/env.yaml \
+            --set-secrets "${SECRETS}" \
+            --allow-unauthenticated \
+            --cpu 1 --memory 512Mi \
+            --min-instances 0 --max-instances 3 \
+            --concurrency 40
+
+      - name: Verify Live Deployment
+        run: |
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project "${PROJECT_ID}" --region "${REGION}" --format='value(status.url)')
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/")
+          echo "Cloud Run : ${URL} → HTTP ${STATUS}"
+          if [ "${STATUS}" -ne 200 ]; then
+            echo "Erreur : le service répond ${STATUS}"
+            exit 1
+          fi

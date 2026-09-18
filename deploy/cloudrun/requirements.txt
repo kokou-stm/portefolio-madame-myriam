@@ -1,0 +1,4 @@
+# Dépendances propres à Cloud Run, en plus du requirements.txt racine.
+# Le disque d'une instance Cloud Run est éphémère : les médias téléversés
+# depuis l'administration vont dans un bucket Cloud Storage.
+django-storages[google]>=1.14.4,<2

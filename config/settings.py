@@ -124,7 +124,12 @@ DATABASES = {
 if os.environ.get("DATABASE_URL"):
     import dj_database_url
 
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    # SSL imposé par défaut (Azure, Cloud Run). DATABASE_SSL_REQUIRE=0 laisse
+    # libpq négocier (« prefer ») : cas de la connexion interne Render.
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=os.environ.get("DATABASE_SSL_REQUIRE", "1") != "0",
+    )
 
 
 # Password validation
@@ -182,6 +187,23 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": _staticfiles_backend},
 }
+
+# Cloud Run : disque éphémère, les médias partent dans un bucket Cloud Storage.
+# Inactif tant que GS_BUCKET_NAME n'est pas défini (Azure et poste local).
+if os.environ.get("GS_BUCKET_NAME"):
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+        "OPTIONS": {
+            "bucket_name": os.environ["GS_BUCKET_NAME"],
+            # Bucket en accès uniforme, lecture publique accordée par IAM :
+            # pas d'ACL par objet ni d'URL signée.
+            "default_acl": None,
+            "querystring_auth": False,
+            # Comme sur disque : un nom déjà pris reçoit un suffixe au lieu
+            # d'écraser l'image existante.
+            "file_overwrite": False,
+        },
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
