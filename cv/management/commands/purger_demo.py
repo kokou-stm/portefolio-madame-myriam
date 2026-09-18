@@ -27,7 +27,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        nombre, _ = Article.objects.filter(titre__in=TITRES_DEMO).delete()
+        # Retrait du site sans suppression : les articles ne sont jamais effacés.
+        nombre = (
+            Article.objects.filter(titre__in=TITRES_DEMO, statut=Article.PUBLIE)
+            .update(statut=Article.BROUILLON)
+        )
 
         if options["rubriques"]:
             from cv.models import Rubrique
@@ -40,7 +44,7 @@ class Command(BaseCommand):
 
         if nombre:
             self.stdout.write(
-                self.style.SUCCESS("Publications de démonstration supprimées.")
+                self.style.SUCCESS("Publications de démonstration repassées en brouillon.")
             )
         else:
             self.stdout.write("Aucune publication de démonstration trouvée.")

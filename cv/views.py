@@ -474,11 +474,27 @@ def admin_article_modifier(request, pk):
 
 @staff_member_required(login_url="connexion_admin")
 def admin_article_supprimer(request, pk):
+    # Aucune suppression réelle : l'article est retiré du site et conservé en
+    # brouillon, pour pouvoir être réactivé à tout moment.
     article = get_object_or_404(Article, pk=pk)
     if request.method == "POST":
-        titre = article.titre
-        article.delete()
-        messages.success(request, f"La publication « {titre} » a été supprimée.")
+        article.statut = Article.BROUILLON
+        article.save(update_fields=["statut", "modifie_le"])
+        messages.success(
+            request,
+            f"La publication « {article.titre} » a été retirée du site et "
+            "conservée dans les brouillons.",
+        )
+    return redirect("admin_dashboard")
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_article_reactiver(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == "POST":
+        article.statut = Article.PUBLIE
+        article.save(update_fields=["statut", "modifie_le"])
+        messages.success(request, f"La publication « {article.titre} » est de nouveau en ligne.")
     return redirect("admin_dashboard")
 
 

@@ -179,6 +179,11 @@ class ArticleAdmin(admin.ModelAdmin):
         n = queryset.update(statut=Article.BROUILLON)
         self.message_user(request, f"{n} publication(s) retirée(s) du site.")
 
+    def has_delete_permission(self, request, obj=None):
+        # Un article ne se supprime jamais : on le retire du site avec l'action
+        # « Repasser en brouillon », ce qui permet de le réactiver ensuite.
+        return False
+
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):

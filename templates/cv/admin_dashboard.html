@@ -106,10 +106,17 @@
                       <a href="{% url 'admin_article_modifier' item.pk %}" class="btn-action btn-action--edit">
                         Modifier
                       </a>
-                      <form method="post" action="{% url 'admin_article_supprimer' item.pk %}" class="form-delete-item" data-item-title="{{ item.titre }}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
-                      </form>
+                      {% if item.statut == 'publie' %}
+                        <form method="post" action="{% url 'admin_article_supprimer' item.pk %}" class="form-delete-item" data-item-title="{{ item.titre }}" data-confirm-message="Retirer du site" data-confirm-subtitle="L'article sera conservé dans les brouillons et pourra être réactivé." data-confirm-button="Retirer du site" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn-action btn-action--delete">Supprimer</button>
+                        </form>
+                      {% else %}
+                        <form method="post" action="{% url 'admin_article_reactiver' item.pk %}" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn-action btn-action--edit">Réactiver</button>
+                        </form>
+                      {% endif %}
                     </div>
                   </td>
                 </tr>
@@ -338,7 +345,7 @@
       </div>
       <div>
         <h3 id="modalTitle" class="admin-modal-title">Confirmer la suppression</h3>
-        <p class="admin-modal-subtitle">Cette action est définitive et ne pourra pas être annulée.</p>
+        <p class="admin-modal-subtitle" id="modalSubtitle">Cette action est définitive et ne pourra pas être annulée.</p>
       </div>
     </div>
 
@@ -361,6 +368,9 @@
     var modalMessage = document.getElementById('modalMessage');
     var btnCancelModal = document.getElementById('btnCancelModal');
     var btnConfirmDelete = document.getElementById('btnConfirmDelete');
+    var modalSubtitle = document.getElementById('modalSubtitle');
+    var sousTitreDefaut = modalSubtitle ? modalSubtitle.textContent : '';
+    var boutonDefaut = btnConfirmDelete ? btnConfirmDelete.textContent : '';
     var currentFormToSubmit = null;
 
     document.querySelectorAll('.form-delete-item').forEach(function (form) {
@@ -368,7 +378,22 @@
         e.preventDefault();
         currentFormToSubmit = this;
         var title = this.getAttribute('data-item-title') || 'cet élément';
-        modalMessage.innerHTML = 'Êtes-vous sûre de vouloir supprimer définitivement « <strong>' + title + '</strong> » ?';
+        // Les articles ne sont que retirés du site : le formulaire fournit
+        // alors ses propres libellés. Les autres éléments restent supprimés.
+        var action = this.getAttribute('data-confirm-message') || 'supprimer définitivement';
+
+        var titreFort = document.createElement('strong');
+        titreFort.textContent = title;
+        modalMessage.textContent = 'Êtes-vous sûre de vouloir ' + action.toLowerCase() + ' « ';
+        modalMessage.appendChild(titreFort);
+        modalMessage.appendChild(document.createTextNode(' » ?'));
+
+        if (modalSubtitle) {
+          modalSubtitle.textContent = this.getAttribute('data-confirm-subtitle') || sousTitreDefaut;
+        }
+        if (btnConfirmDelete) {
+          btnConfirmDelete.textContent = this.getAttribute('data-confirm-button') || boutonDefaut;
+        }
         modalOverlay.removeAttribute('hidden');
       });
     });
