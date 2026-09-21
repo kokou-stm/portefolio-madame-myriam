@@ -72,7 +72,7 @@
               Option 2 — {{ form.fichier.label }}
             </label>
             {{ form.fichier }}
-            <p class="form-help">MP4 recommandé (lisible sur tous les appareils), 100 Mo maximum. L'envoi peut prendre quelques minutes : ne fermez pas la page.</p>
+            <p class="form-help">MP4 recommandé (lisible sur tous les appareils), {{ form.TAILLE_MAX_VIDEO_MO }} Mo maximum. L'envoi peut prendre quelques minutes : ne fermez pas la page.</p>
             {% for erreur in form.fichier.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
           </div>
 
@@ -150,7 +150,7 @@
     if (!form) return;
     var bouton = form.querySelector('button[type="submit"]');
     var libelleBouton = bouton.textContent;
-    var TAILLE_MAX = 100 * 1024 * 1024;
+    var TAILLE_MAX = {{ form.TAILLE_MAX_VIDEO }};
     var FORMATS = ['mp4', 'webm', 'mov', 'm4v'];
 
     // Refuser tout de suite ce que le serveur refuserait après un long envoi.
@@ -166,7 +166,7 @@
         }
         if (fichier.size > TAILLE_MAX) {
           e.preventDefault();
-          alert('Fichier trop lourd (' + Math.round(fichier.size / 1048576) + ' Mo) : 100 Mo maximum.\n' +
+          alert('Fichier trop lourd (' + Math.round(fichier.size / 1048576) + ' Mo) : {{ form.TAILLE_MAX_VIDEO_MO }} Mo maximum.\n' +
                 'Compressez la vidéo ou publiez-la sur YouTube puis collez le lien.');
           return;
         }

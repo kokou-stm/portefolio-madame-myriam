@@ -138,9 +138,11 @@ class ArticleForm(forms.ModelForm):
 
 
 class VideoForm(forms.ModelForm):
-    # Plafond d'envoi de Cloudflare en offre gratuite (nuage orange) : au-delà,
-    # la requête serait coupée avant même d'atteindre le site.
-    TAILLE_MAX_VIDEO = 100 * 1024 * 1024
+    # Seule valeur à changer : le gabarit et le contrôle avant envoi la lisent.
+    # Un envoi de 410 Mo traverse Cloudflare et Render jusqu'au site ; c'est
+    # ensuite la taille du disque Render qui borne le nombre de vidéos.
+    TAILLE_MAX_VIDEO_MO = 400
+    TAILLE_MAX_VIDEO = TAILLE_MAX_VIDEO_MO * 1024 * 1024
 
     class Meta:
         model = Video
@@ -177,7 +179,7 @@ class VideoForm(forms.ModelForm):
         if isinstance(fichier, UploadedFile) and fichier.size > self.TAILLE_MAX_VIDEO:
             taille_mo = fichier.size / (1024 * 1024)
             raise forms.ValidationError(
-                f"Fichier trop lourd ({taille_mo:.0f} Mo) : 100 Mo maximum. "
+                f"Fichier trop lourd ({taille_mo:.0f} Mo) : {self.TAILLE_MAX_VIDEO_MO} Mo maximum. "
                 "Compressez la vidéo ou publiez-la sur YouTube puis collez le lien."
             )
         return fichier
