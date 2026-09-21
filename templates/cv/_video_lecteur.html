@@ -1,0 +1,25 @@
+{% comment %}
+  Lecteur d'une carte vidéo de la galerie.
+  Fichier téléversé : lecteur natif. Lien YouTube : vignette, puis iframe au clic.
+  Paramètre : taille_bouton (diamètre du bouton de lecture, en pixels).
+{% endcomment %}
+{% if video.fichier %}
+<div class="video-card__player video-card__player--fichier">
+  {# Sans image d'aperçu, « #t=0.1 » fait afficher la première image (Safari). #}
+  <video controls playsinline preload="metadata" aria-label="{{ video.titre }}"{% if video.vignette %} poster="{{ video.vignette.url }}"{% endif %}>
+    <source src="{{ video.fichier.url }}{% if not video.vignette %}#t=0.1{% endif %}">
+    Votre navigateur ne peut pas lire cette vidéo.
+    <a href="{{ video.fichier.url }}">Télécharger la vidéo</a>.
+  </video>
+</div>
+{% else %}
+<div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-title="{{ video.titre }}">
+  <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
+  <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
+    <svg width="{{ taille_bouton }}" height="{{ taille_bouton }}" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />
+      <polygon points="19,14 34,24 19,34" fill="#d4af37" />
+    </svg>
+  </button>
+</div>
+{% endif %}

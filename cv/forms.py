@@ -1,4 +1,5 @@
 from django import forms
+from django.core.files.uploadedfile import UploadedFile
 
 from .models import Article, EmailAutorise, Message, Photo, Rubrique, Video
 
@@ -137,9 +138,16 @@ class ArticleForm(forms.ModelForm):
 
 
 class VideoForm(forms.ModelForm):
+    # Plafond d'envoi de Cloudflare en offre gratuite (nuage orange) : au-delà,
+    # la requête serait coupée avant même d'atteindre le site.
+    TAILLE_MAX_VIDEO = 100 * 1024 * 1024
+
     class Meta:
         model = Video
-        fields = ["titre", "youtube_url", "thematique", "est_short", "date", "legende", "ordre"]
+        fields = [
+            "titre", "youtube_url", "fichier", "vignette",
+            "thematique", "est_short", "date", "legende", "ordre",
+        ]
         widgets = {
             "titre": forms.TextInput(
                 attrs={"placeholder": "Ex: Intervention à l'Assemblée Nationale", "class": "form-input"}
@@ -150,6 +158,10 @@ class VideoForm(forms.ModelForm):
                     "class": "form-input",
                 }
             ),
+            "fichier": forms.ClearableFileInput(
+                attrs={"class": "form-input", "accept": "video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v"}
+            ),
+            "vignette": forms.ClearableFileInput(attrs={"class": "form-input", "accept": "image/*"}),
             "thematique": forms.Select(attrs={"class": "form-select"}),
             "est_short": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
             "date": forms.TextInput(attrs={"placeholder": "Ex: Juin 2024", "class": "form-input"}),
@@ -158,6 +170,17 @@ class VideoForm(forms.ModelForm):
             ),
             "ordre": forms.NumberInput(attrs={"class": "form-input"}),
         }
+
+    def clean_fichier(self):
+        fichier = self.cleaned_data.get("fichier")
+        # Seul un nouvel envoi est contrôlé, pas le fichier déjà enregistré.
+        if isinstance(fichier, UploadedFile) and fichier.size > self.TAILLE_MAX_VIDEO:
+            taille_mo = fichier.size / (1024 * 1024)
+            raise forms.ValidationError(
+                f"Fichier trop lourd ({taille_mo:.0f} Mo) : 100 Mo maximum. "
+                "Compressez la vidéo ou publiez-la sur YouTube puis collez le lien."
+            )
+        return fichier
 
 
 class PhotoForm(forms.ModelForm):

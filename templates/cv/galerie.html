@@ -48,15 +48,7 @@ missions de terrain.{% endblock %}
             <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
           </div>
 
-          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-thumb-url="{{ video.thumbnail_url }}" data-title="{{ video.titre }}">
-            <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
-            <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
-              <svg width="54" height="54" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />
-                <polygon points="19,14 34,24 19,34" fill="#d4af37" />
-              </svg>
-            </button>
-          </div>
+          {% include "cv/_video_lecteur.html" with taille_bouton=54 %}
 
           <div class="video-card__body">
             <h4 class="video-card__title">{{ video.titre }}</h4>
@@ -67,9 +59,11 @@ missions de terrain.{% endblock %}
               {% if video.date %}
               <span class="video-card__date">📅 {{ video.date }}</span>
               {% endif %}
+              {% if video.youtube_url %}
               <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
                 Sur YouTube ↗
               </a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -88,15 +82,7 @@ missions de terrain.{% endblock %}
             <span class="badge badge--gold">{{ video.get_thematique_display }}</span>
           </div>
 
-          <div class="video-card__player" data-embed-url="{{ video.embed_url }}" data-thumb-url="{{ video.thumbnail_url }}" data-title="{{ video.titre }}">
-            <img src="{{ video.thumbnail_url }}" alt="{{ video.titre }}" class="video-card__thumb" loading="lazy">
-            <button class="video-card__play" type="button" aria-label="Lire la vidéo {{ video.titre }}">
-              <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />
-                <polygon points="19,14 34,24 19,34" fill="#d4af37" />
-              </svg>
-            </button>
-          </div>
+          {% include "cv/_video_lecteur.html" with taille_bouton=60 %}
 
           <div class="video-card__body">
             <h4 class="video-card__title">{{ video.titre }}</h4>
@@ -107,9 +93,11 @@ missions de terrain.{% endblock %}
               {% if video.date %}
               <span class="video-card__date">📅 {{ video.date }}</span>
               {% endif %}
+              {% if video.youtube_url %}
               <a class="video-card__lien" href="{{ video.youtube_url }}" target="_blank" rel="noopener noreferrer">
                 Regarder sur YouTube ↗
               </a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -175,31 +163,42 @@ missions de terrain.{% endblock %}
 <script src="{% static 'js/galerie.js' %}" defer></script>{% endif %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.video-card__player').forEach(function (player) {
-      player.addEventListener('click', function () {
-        // Arrêter toute autre vidéo en cours de lecture
-        document.querySelectorAll('.video-card__player').forEach(function (otherPlayer) {
-          if (otherPlayer !== player && otherPlayer.querySelector('iframe')) {
-            var thumbUrl = otherPlayer.getAttribute('data-thumb-url');
-            var title = otherPlayer.getAttribute('data-title');
-            var isStandard = otherPlayer.closest('.video-card--standard');
-            var btnSize = isStandard ? 60 : 54;
-            otherPlayer.innerHTML = '<img src="' + thumbUrl + '" alt="' + title + '" class="video-card__thumb" loading="lazy">' +
-              '<button class="video-card__play" type="button" aria-label="Lire la vidéo ' + title + '">' +
-              '<svg width="' + btnSize + '" height="' + btnSize + '" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-              '<circle cx="24" cy="24" r="23" fill="#0b1424" stroke="#d4af37" stroke-width="2.5" />' +
-              '<polygon points="19,14 34,24 19,34" fill="#d4af37" />' +
-              '</svg></button>';
-          }
-        });
+    var lecteursYoutube = document.querySelectorAll('.video-card__player[data-embed-url]');
+    var videosFichier = document.querySelectorAll('.video-card__player--fichier video');
 
-        // Lancer la lecture de la vidéo cliquée si elle n'est pas déjà chargée
-        if (!this.querySelector('iframe')) {
-          var embedUrl = this.getAttribute('data-embed-url');
-          var title = this.getAttribute('data-title');
-          this.innerHTML = '<iframe src="' + embedUrl + '" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    // Vignette d'origine de chaque lecteur YouTube, restaurée à l'arrêt.
+    var vignettes = new Map();
+    lecteursYoutube.forEach(function (lecteur) { vignettes.set(lecteur, lecteur.innerHTML); });
+
+    // Une seule vidéo à la fois, qu'elle vienne de YouTube ou d'un fichier.
+    function arreterLesAutres(sauf) {
+      lecteursYoutube.forEach(function (lecteur) {
+        if (lecteur !== sauf && lecteur.querySelector('iframe')) {
+          lecteur.innerHTML = vignettes.get(lecteur);
         }
       });
+      videosFichier.forEach(function (video) {
+        if (video !== sauf) video.pause();
+      });
+    }
+
+    lecteursYoutube.forEach(function (lecteur) {
+      lecteur.addEventListener('click', function () {
+        arreterLesAutres(lecteur);
+        if (lecteur.querySelector('iframe')) return;
+        var iframe = document.createElement('iframe');
+        iframe.src = lecteur.getAttribute('data-embed-url');
+        iframe.title = lecteur.getAttribute('data-title');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        iframe.allowFullscreen = true;
+        lecteur.replaceChildren(iframe);
+      });
+    });
+
+    videosFichier.forEach(function (video) {
+      video.addEventListener('play', function () { arreterLesAutres(video); });
     });
   });
 </script>

@@ -503,10 +503,10 @@ def admin_article_reactiver(request, pk):
 @staff_member_required(login_url="connexion_admin")
 def admin_video_creer(request):
     if request.method == "POST":
-        form = VideoForm(request.POST)
+        form = VideoForm(request.POST, request.FILES)
         if form.is_valid():
             video = form.save()
-            messages.success(request, f"La vidéo YouTube « {video.titre} » a été ajoutée à la galerie.")
+            messages.success(request, f"La vidéo « {video.titre} » a été ajoutée à la galerie.")
             return redirect("admin_dashboard")
     else:
         form = VideoForm()
@@ -517,7 +517,7 @@ def admin_video_creer(request):
         {
             "profil": _profil(),
             "form": form,
-            "titre_page": "Ajouter une vidéo YouTube à la galerie",
+            "titre_page": "Ajouter une vidéo à la galerie",
             "bouton_action": "Ajouter la vidéo",
         },
     )
@@ -527,7 +527,7 @@ def admin_video_creer(request):
 def admin_video_modifier(request, pk):
     video = get_object_or_404(Video, pk=pk)
     if request.method == "POST":
-        form = VideoForm(request.POST, instance=video)
+        form = VideoForm(request.POST, request.FILES, instance=video)
         if form.is_valid():
             video = form.save()
             messages.success(request, f"La vidéo « {video.titre} » a bien été mise à jour.")

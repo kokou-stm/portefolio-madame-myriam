@@ -223,7 +223,7 @@ class VideoAdmin(admin.ModelAdmin):
     list_filter = ("thematique", "est_short")
     search_fields = ("titre", "legende", "youtube_url")
     fieldsets = (
-        (None, {"fields": ("titre", "youtube_url", "thematique", "est_short")}),
+        (None, {"fields": ("titre", "youtube_url", "fichier", "vignette", "thematique", "est_short")}),
         ("Détails", {"fields": ("date", "legende", "ordre")}),
     )
 

@@ -3713,6 +3713,21 @@ img {
   border: 0;
 }
 
+/* Vidéo téléversée : lecteur natif du navigateur, sans vignette cliquable. */
+.video-card__player--fichier {
+  cursor: default;
+}
+
+.video-card__player video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
 .video-card__body {
   padding: 1.5rem;
   display: flex;

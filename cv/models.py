@@ -1,6 +1,8 @@
 import re
 
 import markdown
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.templatetags.static import static
 from django.urls import reverse
@@ -535,8 +537,26 @@ class Video(models.Model):
     ]
 
     titre = models.CharField("Titre de la vidéo", max_length=220)
-    youtube_url = models.URLField("Lien YouTube", max_length=500)
+    youtube_url = models.URLField(
+        "Lien YouTube",
+        max_length=500,
+        blank=True,
+        help_text="Renseigner soit un lien YouTube, soit un fichier vidéo.",
+    )
     youtube_id = models.CharField("ID YouTube", max_length=50, blank=True)
+    fichier = models.FileField(
+        "Fichier vidéo",
+        upload_to="videos/",
+        blank=True,
+        validators=[FileExtensionValidator(["mp4", "webm", "mov", "m4v"])],
+        help_text="MP4 recommandé (lisible sur tous les appareils).",
+    )
+    vignette = models.ImageField(
+        "Image d'aperçu",
+        upload_to="videos/apercus/",
+        blank=True,
+        help_text="Facultatif : image affichée avant la lecture d'un fichier vidéo.",
+    )
     est_short = models.BooleanField("Format Short (vertical)", default=False)
     thematique = models.CharField(
         "Thématique", max_length=30, choices=THEMATIQUES, default=PARLEMENT
@@ -553,16 +573,30 @@ class Video(models.Model):
     def __str__(self):
         return self.titre
 
-    def save(self, *args, **kwargs):
-        if not self.youtube_id and self.youtube_url:
-            import re
+    def clean(self):
+        super().clean()
+        if self.youtube_url and self.fichier:
+            raise ValidationError(
+                {"youtube_url": "Choisissez l'un ou l'autre : un lien YouTube ou un fichier vidéo."}
+            )
+        if not self.youtube_url and not self.fichier:
+            raise ValidationError(
+                {"youtube_url": "Indiquez un lien YouTube ou téléversez un fichier vidéo."}
+            )
 
+    def save(self, *args, **kwargs):
+        # Recalculé à chaque enregistrement : un lien modifié ne doit pas
+        # garder l'identifiant de l'ancienne vidéo, ni un lien retiré (passage
+        # à un fichier téléversé) laisser un identifiant orphelin.
+        if self.youtube_url:
             match = re.search(
                 r"(?:youtube\.com\/(?:shorts\/|watch\?v=)|youtu\.be\/)([\w-]+)",
                 self.youtube_url,
             )
             if match:
                 self.youtube_id = match.group(1)
+        else:
+            self.youtube_id = ""
         super().save(*args, **kwargs)
 
     @property
@@ -571,7 +605,11 @@ class Video(models.Model):
 
     @property
     def thumbnail_url(self):
-        return f"https://i.ytimg.com/vi/{self.youtube_id}/hqdefault.jpg"
+        if self.vignette:
+            return self.vignette.url
+        if self.youtube_id:
+            return f"https://i.ytimg.com/vi/{self.youtube_id}/hqdefault.jpg"
+        return ""
 
 
 class EmailAutorise(models.Model):

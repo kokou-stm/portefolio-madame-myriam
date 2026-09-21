@@ -156,7 +156,11 @@
                 <tr>
                   <td>
                     <div style="display:flex; align-items:center; gap:0.75rem;">
-                      <img src="{{ vid.thumbnail_url }}" alt="{{ vid.titre }}" style="width:64px; height:40px; object-fit:cover; border-radius:4px; flex-shrink:0;">
+                      {% if vid.thumbnail_url %}
+                        <img src="{{ vid.thumbnail_url }}" alt="{{ vid.titre }}" style="width:64px; height:40px; object-fit:cover; border-radius:4px; flex-shrink:0;">
+                      {% else %}
+                        <span aria-hidden="true" style="width:64px; height:40px; border-radius:4px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; background:#0b1424; font-size:20px;">🎞️</span>
+                      {% endif %}
                       <div>
                         <strong>{{ vid.titre }}</strong>
                         {% if vid.legende %}<br><small class="text-muted">{{ vid.legende|truncatechars:60 }}</small>{% endif %}
@@ -178,7 +182,11 @@
                   </td>
                   <td class="text-right">
                     <div class="admin-actions">
-                      <a href="{{ vid.youtube_url }}" target="_blank" class="btn-icon" title="Regarder sur YouTube">↗</a>
+                      {% if vid.youtube_url %}
+                        <a href="{{ vid.youtube_url }}" target="_blank" class="btn-icon" title="Regarder sur YouTube">↗</a>
+                      {% elif vid.fichier %}
+                        <a href="{{ vid.fichier.url }}" target="_blank" class="btn-icon" title="Voir le fichier vidéo">▶</a>
+                      {% endif %}
                       <a href="{% url 'admin_video_modifier' vid.pk %}" class="btn-action btn-action--edit">Modifier</a>
                       <form method="post" action="{% url 'admin_video_supprimer' vid.pk %}" class="form-delete-item" data-item-title="{{ vid.titre }}" style="display:inline;">
                         {% csrf_token %}

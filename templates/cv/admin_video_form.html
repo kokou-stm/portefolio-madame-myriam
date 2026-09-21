@@ -24,14 +24,14 @@
       <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 
-    <form method="post" class="admin-editor-form" novalidate>
+    <form method="post" enctype="multipart/form-data" class="admin-editor-form" novalidate>
       {% csrf_token %}
 
       <div class="admin-card">
         <div class="admin-card__header">
           <h3 class="admin-card__title">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M10 15l5-3-5-3v6z"></path></svg>
-            Détails de la Vidéo YouTube
+            Détails de la vidéo
           </h3>
         </div>
         <div class="admin-card__body">
@@ -45,14 +45,35 @@
             {% for erreur in form.titre.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
           </div>
 
-          <!-- Lien YouTube -->
+          <p class="form-help"><strong>Source de la vidéo</strong> <span class="req">*</span> : collez un lien YouTube <em>ou</em> téléversez un fichier, pas les deux.</p>
+
+          <!-- Option 1 : lien YouTube -->
           <div class="form__field">
             <label for="{{ form.youtube_url.id_for_label }}" class="form-label">
-              {{ form.youtube_url.label }} <span class="req">*</span>
+              Option 1 — {{ form.youtube_url.label }}
             </label>
             {{ form.youtube_url }}
-            <p class="form-help">Collez l'adresse web complète de la vidéo YouTube (ex: <code>https://www.youtube.com/watch?v=...</code>, <code>https://youtu.be/...</code> ou <code>https://youtube.com/shorts/...</code>).</p>
+            <p class="form-help">Adresse complète de la vidéo (ex : <code>https://www.youtube.com/watch?v=...</code>, <code>https://youtu.be/...</code> ou <code>https://youtube.com/shorts/...</code>).</p>
             {% for erreur in form.youtube_url.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+          </div>
+
+          <!-- Option 2 : fichier téléversé -->
+          <div class="form__field">
+            <label for="{{ form.fichier.id_for_label }}" class="form-label">
+              Option 2 — {{ form.fichier.label }}
+            </label>
+            {{ form.fichier }}
+            <p class="form-help">MP4 recommandé (lisible sur tous les appareils), 100 Mo maximum. L'envoi peut prendre quelques minutes : ne fermez pas la page.</p>
+            {% for erreur in form.fichier.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+          </div>
+
+          <div class="form__field">
+            <label for="{{ form.vignette.id_for_label }}" class="form-label">
+              {{ form.vignette.label }} (facultatif, pour un fichier téléversé)
+            </label>
+            {{ form.vignette }}
+            <p class="form-help">Image affichée avant la lecture. Sans elle, la première image de la vidéo est utilisée.</p>
+            {% for erreur in form.vignette.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
           </div>
 
           <!-- Thématique & Format -->
