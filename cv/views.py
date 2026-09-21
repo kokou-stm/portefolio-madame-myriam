@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
@@ -34,6 +36,8 @@ from .models import (
     Rubrique,
     Video,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _profil():
@@ -500,6 +504,18 @@ def admin_article_reactiver(request, pk):
 
 # --- Gestion des Vidéos YouTube (Espace Admin) ---
 
+def _journaliser_refus_video(request, form):
+    """Trace un formulaire vidéo refusé : l'envoi échoue souvent loin de nous."""
+    envoi = request.FILES.get("fichier")
+    logger.warning(
+        "Vidéo refusée (utilisateur %s, fichier %s, %s octets) : %s",
+        request.user.get_username(),
+        envoi.name if envoi else "aucun",
+        envoi.size if envoi else 0,
+        form.errors.as_json(),
+    )
+
+
 @staff_member_required(login_url="connexion_admin")
 def admin_video_creer(request):
     if request.method == "POST":
@@ -508,6 +524,7 @@ def admin_video_creer(request):
             video = form.save()
             messages.success(request, f"La vidéo « {video.titre} » a été ajoutée à la galerie.")
             return redirect("admin_dashboard")
+        _journaliser_refus_video(request, form)
     else:
         form = VideoForm()
 
@@ -532,6 +549,7 @@ def admin_video_modifier(request, pk):
             video = form.save()
             messages.success(request, f"La vidéo « {video.titre} » a bien été mise à jour.")
             return redirect("admin_dashboard")
+        _journaliser_refus_video(request, form)
     else:
         form = VideoForm(instance=video)
 

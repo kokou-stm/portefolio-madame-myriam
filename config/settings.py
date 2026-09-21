@@ -244,6 +244,9 @@ LOGGING = {
     },
     "loggers": {
         "django": {"handlers": ["console"], "level": "INFO"},
+        # Journal de l'application (refus de formulaire, etc.), visible dans
+        # les logs de l'hébergeur.
+        "cv": {"handlers": ["console"], "level": "INFO", "propagate": False},
         "django.request": {
             "handlers": ["console"],
             "level": "ERROR",

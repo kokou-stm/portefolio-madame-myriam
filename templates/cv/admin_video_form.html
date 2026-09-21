@@ -24,7 +24,16 @@
       <div class="alerte alerte--{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 
-    <form method="post" enctype="multipart/form-data" class="admin-editor-form" novalidate>
+    {% if form.errors %}
+      <div class="alerte alerte--error" role="alert">
+        <strong>La vidéo n'a pas été enregistrée.</strong>
+        Corrigez le ou les champs indiqués en rouge ci-dessous.
+        Si vous aviez choisi un fichier vidéo, resélectionnez-le : le navigateur le retire après un refus.
+        {% for erreur in form.non_field_errors %}<br>{{ erreur }}{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="admin-editor-form" id="form-video" novalidate>
       {% csrf_token %}
 
       <div class="admin-card">
@@ -102,6 +111,7 @@
                 {{ form.est_short }}
                 <span>Format Short (vidéo verticale 9:16)</span>
               </label>
+              {% for erreur in form.est_short.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
             </div>
 
             <div class="form__field">
@@ -109,6 +119,7 @@
                 Ordre d'affichage
               </label>
               {{ form.ordre }}
+              {% for erreur in form.ordre.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
             </div>
           </div>
 
@@ -130,4 +141,47 @@
     </form>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var form = document.getElementById('form-video');
+    if (!form) return;
+    var bouton = form.querySelector('button[type="submit"]');
+    var libelleBouton = bouton.textContent;
+    var TAILLE_MAX = 100 * 1024 * 1024;
+    var FORMATS = ['mp4', 'webm', 'mov', 'm4v'];
+
+    // Refuser tout de suite ce que le serveur refuserait après un long envoi.
+    form.addEventListener('submit', function (e) {
+      var champ = form.querySelector('input[type="file"][name="fichier"]');
+      var fichier = champ && champ.files[0];
+      if (fichier) {
+        var extension = fichier.name.split('.').pop().toLowerCase();
+        if (FORMATS.indexOf(extension) === -1) {
+          e.preventDefault();
+          alert('Format non accepté (.' + extension + '). Formats possibles : MP4, WebM, MOV.');
+          return;
+        }
+        if (fichier.size > TAILLE_MAX) {
+          e.preventDefault();
+          alert('Fichier trop lourd (' + Math.round(fichier.size / 1048576) + ' Mo) : 100 Mo maximum.\n' +
+                'Compressez la vidéo ou publiez-la sur YouTube puis collez le lien.');
+          return;
+        }
+      }
+      bouton.disabled = true;
+      bouton.textContent = fichier
+        ? 'Envoi en cours (' + Math.round(fichier.size / 1048576) + ' Mo)… ne fermez pas la page'
+        : 'Enregistrement…';
+    });
+
+    // Retour arrière du navigateur : la page revient du cache, bouton bloqué.
+    window.addEventListener('pageshow', function () {
+      bouton.disabled = false;
+      bouton.textContent = libelleBouton;
+    });
+  })();
+</script>
 {% endblock %}
