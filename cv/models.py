@@ -646,3 +646,33 @@ class CodeSecurite2FA(models.Model):
         return not self.est_utilise and timezone.now() < self.expire_le
 
 
+class AppareilDeConfiance(models.Model):
+    """Appareil + adresse IP déjà validés par code e-mail.
+
+    Principe Parcoursup : tant que la connexion vient du même appareil (cookie
+    signé) ET de la même adresse IP, on ne redemande pas le code 2FA. Un nouvel
+    appareil OU une nouvelle IP déclenche l'envoi d'un code de validation.
+    """
+
+    user = models.ForeignKey(
+        "auth.User", on_delete=models.CASCADE, related_name="appareils_confiance"
+    )
+    jeton = models.CharField("Jeton d'appareil", max_length=64, unique=True)
+    adresse_ip = models.GenericIPAddressField("Adresse IP validée")
+    user_agent = models.CharField("Navigateur / appareil", max_length=300, blank=True)
+    cree_le = models.DateTimeField("Validé le", auto_now_add=True)
+    derniere_connexion_le = models.DateTimeField("Dernière connexion", auto_now=True)
+    expire_le = models.DateTimeField("Expire le")
+
+    class Meta:
+        verbose_name = "Appareil de confiance"
+        verbose_name_plural = "Appareils de confiance"
+        ordering = ["-derniere_connexion_le"]
+
+    def __str__(self):
+        return f"{self.user} — {self.adresse_ip}"
+
+    def est_valide(self):
+        return timezone.now() < self.expire_le
+
+

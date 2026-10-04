@@ -1,5 +1,7 @@
 import logging
+import secrets
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
@@ -21,6 +23,7 @@ from .forms import (
     VideoForm,
 )
 from .models import (
+    AppareilDeConfiance,
     Article,
     Chiffre,
     CodeSecurite2FA,
@@ -211,6 +214,22 @@ def contact(request):
     return render(request, "cv/contact.html", {"profil": _profil(), "form": form})
 
 
+# Nom du cookie qui identifie un appareil de confiance, et sa durée de vie.
+COOKIE_APPAREIL = "appareil_confiance"
+DUREE_APPAREIL = timezone.timedelta(days=90)
+
+
+def _ip_client(request):
+    """IP réelle du visiteur, même derrière Cloudflare / un proxy."""
+    ip = request.META.get("HTTP_CF_CONNECTING_IP")
+    if not ip:
+        xff = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        ip = xff.split(",")[0].strip() if xff else ""
+    if not ip:
+        ip = request.META.get("REMOTE_ADDR", "")
+    return ip or ""
+
+
 def connexion_admin(request):
     if request.user.is_authenticated and request.user.is_staff:
         return redirect("admin_dashboard")
@@ -243,6 +262,36 @@ def connexion_admin(request):
                     user = authenticate(request, username=user_obj.username, password=password)
 
             if user is not None and user.is_staff:
+                # 2bis. Appareil + IP déjà validés ? → connexion directe, sans code.
+                ip_actuelle = _ip_client(request)
+                jeton_cookie = request.COOKIES.get(COOKIE_APPAREIL)
+                appareil = None
+                if jeton_cookie:
+                    appareil = AppareilDeConfiance.objects.filter(
+                        user=user, jeton=jeton_cookie
+                    ).first()
+
+                if (
+                    appareil
+                    and appareil.est_valide()
+                    and appareil.adresse_ip == ip_actuelle
+                ):
+                    appareil.save()  # rafraîchit derniere_connexion_le (auto_now)
+                    login(request, user)
+                    messages.success(
+                        request,
+                        f"Bienvenue {user.first_name or user.username}. "
+                        "Appareil reconnu, connexion directe.",
+                    )
+                    return redirect("admin_dashboard")
+
+                # Nouvel appareil OU nouvelle IP → on mémorise le contexte pour
+                # l'enregistrer une fois le code validé.
+                request.session["pending_2fa_ip"] = ip_actuelle
+                request.session["pending_2fa_ua"] = request.META.get(
+                    "HTTP_USER_AGENT", ""
+                )[:300]
+
                 # 3. Génération du code 2FA à 6 chiffres
                 import random
                 code_digits = f"{random.randint(100000, 999999)}"
@@ -259,12 +308,17 @@ def connexion_admin(request):
                     from django.core.mail import send_mail
                     dest_email = user.email or user.username
                     send_mail(
-                        subject="[2FA] Votre code de sécurité — Administration Myriam Dossou d'Almeida",
+                        subject="[Sécurité] Nouvelle connexion à valider — Administration Myriam Dossou d'Almeida",
                         message=(
                             f"Bonjour,\n\n"
-                            f"Voici votre code de sécurité 2FA pour vous connecter à l'Espace Administration : {code_digits}\n\n"
-                            f"Ce code est à usage unique et expire dans 10 minutes.\n\n"
-                            f"Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.\n\n"
+                            f"Une connexion à l'Espace Administration a été demandée depuis "
+                            f"un nouvel appareil ou une nouvelle adresse (IP : {ip_actuelle or 'inconnue'}).\n\n"
+                            f"Pour la valider, saisissez ce code de sécurité : {code_digits}\n\n"
+                            f"Ce code est à usage unique et expire dans 10 minutes. "
+                            f"Une fois validé, cet appareil sera reconnu et le code ne vous sera plus "
+                            f"redemandé tant que vous vous connectez depuis le même appareil et la même adresse.\n\n"
+                            f"Si vous n'êtes PAS à l'origine de cette connexion, ne communiquez ce code à "
+                            f"personne et changez votre mot de passe sans tarder.\n\n"
                             f"Cordialement,\n"
                             f"Cabinet Myriam Dossou d'Almeida"
                         ),
@@ -314,11 +368,49 @@ def connexion_2fa(request):
                 request.session.pop("pending_2fa_user_id", None)
                 request.session.pop("pending_2fa_code_id", None)
 
+                # Mémoriser cet appareil + IP : il sera reconnu aux prochaines
+                # connexions (tant que l'appareil et l'IP ne changent pas).
+                ip = request.session.pop("pending_2fa_ip", "") or _ip_client(request)
+                ua = request.session.pop("pending_2fa_ua", "")
+                jeton_cookie = request.COOKIES.get(COOKIE_APPAREIL)
+                appareil = (
+                    AppareilDeConfiance.objects.filter(
+                        user=user, jeton=jeton_cookie
+                    ).first()
+                    if jeton_cookie
+                    else None
+                )
+                if appareil:
+                    appareil.adresse_ip = ip or appareil.adresse_ip
+                    appareil.user_agent = ua or appareil.user_agent
+                    appareil.expire_le = timezone.now() + DUREE_APPAREIL
+                    appareil.save()
+                    jeton = appareil.jeton
+                else:
+                    jeton = secrets.token_urlsafe(32)
+                    AppareilDeConfiance.objects.create(
+                        user=user,
+                        jeton=jeton,
+                        adresse_ip=ip or "0.0.0.0",
+                        user_agent=ua,
+                        expire_le=timezone.now() + DUREE_APPAREIL,
+                    )
+
                 messages.success(
                     request,
-                    f"Authentification 2FA réussie ! Bienvenue {user.first_name or user.username} dans votre espace d'administration."
+                    f"Authentification réussie ! Bienvenue {user.first_name or user.username} "
+                    "dans votre espace d'administration. Cet appareil est désormais reconnu.",
                 )
-                return redirect("admin_dashboard")
+                reponse = redirect("admin_dashboard")
+                reponse.set_cookie(
+                    COOKIE_APPAREIL,
+                    jeton,
+                    max_age=int(DUREE_APPAREIL.total_seconds()),
+                    httponly=True,
+                    samesite="Lax",
+                    secure=not settings.DEBUG,
+                )
+                return reponse
             else:
                 messages.error(request, "Code de sécurité à 6 chiffres incorrect.")
     else:

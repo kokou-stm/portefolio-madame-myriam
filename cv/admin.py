@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import (
+    AppareilDeConfiance,
     Article,
     Chiffre,
     CodeSecurite2FA,
@@ -239,6 +240,21 @@ class CodeSecurite2FAAdmin(admin.ModelAdmin):
     list_display = ("user", "code", "cree_le", "expire_le", "est_utilise")
     list_filter = ("est_utilise",)
     search_fields = ("user__email", "user__username", "code")
+
+
+@admin.register(AppareilDeConfiance)
+class AppareilDeConfianceAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "adresse_ip",
+        "derniere_connexion_le",
+        "expire_le",
+        "user_agent",
+    )
+    search_fields = ("user__email", "user__username", "adresse_ip", "user_agent")
+    readonly_fields = ("jeton", "cree_le", "derniere_connexion_le")
+    # Révoquer un appareil = le supprimer ici ; la prochaine connexion
+    # depuis cet appareil redemandera un code de validation.
 
 
 @admin.register(Message)
