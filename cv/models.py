@@ -675,4 +675,46 @@ class AppareilDeConfiance(models.Model):
     def est_valide(self):
         return timezone.now() < self.expire_le
 
+    # Alias lisible pour les gabarits (« actif » = non expiré).
+    @property
+    def est_actif(self):
+        return self.est_valide()
+
+    @property
+    def navigateur(self):
+        ua = self.user_agent or ""
+        # L'ordre compte : Edge/Opera contiennent « Chrome », Chrome contient
+        # « Safari ». On teste donc du plus spécifique au plus générique.
+        for cle, nom in (
+            ("Edg", "Edge"),
+            ("OPR", "Opera"),
+            ("Chrome", "Chrome"),
+            ("Firefox", "Firefox"),
+            ("Safari", "Safari"),
+        ):
+            if cle in ua:
+                return nom
+        return "Navigateur inconnu"
+
+    @property
+    def systeme(self):
+        ua = self.user_agent or ""
+        if "iPhone" in ua:
+            return "iPhone"
+        if "iPad" in ua:
+            return "iPad"
+        if "Android" in ua:
+            return "Android"
+        if "Windows" in ua:
+            return "Windows"
+        if "Macintosh" in ua or "Mac OS" in ua:
+            return "macOS"
+        if "Linux" in ua:
+            return "Linux"
+        return "Système inconnu"
+
+    @property
+    def appareil_lisible(self):
+        return f"{self.navigateur} · {self.systeme}"
+
 

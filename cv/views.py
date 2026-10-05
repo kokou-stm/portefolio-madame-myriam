@@ -441,6 +441,8 @@ def admin_dashboard(request):
     videos = Video.objects.all()
     photos = Photo.objects.all()
     emails_autorises = EmailAutorise.objects.all()
+    appareils = AppareilDeConfiance.objects.select_related("user").all()
+    jeton_actuel = request.COOKIES.get(COOKIE_APPAREIL)
 
     nb_total = articles.count()
     nb_publies = articles.filter(statut=Article.PUBLIE).count()
@@ -457,6 +459,8 @@ def admin_dashboard(request):
             "videos": videos,
             "photos": photos,
             "emails_autorises": emails_autorises,
+            "appareils": appareils,
+            "jeton_actuel": jeton_actuel,
             "nb_total": nb_total,
             "nb_publies": nb_publies,
             "nb_brouillons": nb_brouillons,
@@ -513,6 +517,22 @@ def admin_email_autorise_supprimer(request, pk):
         email_str = email_obj.email
         email_obj.delete()
         messages.success(request, f"L'adresse e-mail « {email_str} » a été retirée des accès autorisés.")
+    return redirect("admin_dashboard")
+
+
+@staff_member_required(login_url="connexion_admin")
+def admin_appareil_supprimer(request, pk):
+    """Révoque un appareil de confiance : un code sera redemandé à sa
+    prochaine connexion."""
+    appareil = get_object_or_404(AppareilDeConfiance, pk=pk)
+    if request.method == "POST":
+        libelle = f"{appareil.appareil_lisible} ({appareil.adresse_ip})"
+        appareil.delete()
+        messages.success(
+            request,
+            f"Appareil révoqué : {libelle}. Un code de validation sera redemandé "
+            "à la prochaine connexion depuis cet appareil.",
+        )
     return redirect("admin_dashboard")
 
 

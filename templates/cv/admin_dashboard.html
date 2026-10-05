@@ -312,6 +312,64 @@
       {% endif %}
     </div>
 
+    <!-- Section : Appareils & navigateurs autorisés (validés par code 2FA) -->
+    <div class="admin-panel">
+      <div class="admin-panel__header">
+        <h3>💻 Appareils & navigateurs autorisés ({{ appareils|length }})</h3>
+      </div>
+
+      {% if appareils %}
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Appareil / Navigateur</th>
+                <th>Adresse IP</th>
+                <th>Dernière connexion</th>
+                <th>Statut</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ap in appareils %}
+                <tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:0.6rem;">
+                      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:{% if ap.est_actif %}#16a34a{% else %}#9ca3af{% endif %};"></span>
+                      <strong>{{ ap.appareil_lisible }}</strong>
+                      {% if ap.jeton == jeton_actuel %}<span class="badge badge--gold">cet appareil</span>{% endif %}
+                    </div>
+                    <div class="text-muted" style="font-size:0.75rem; margin-top:0.2rem;">{{ ap.user.email|default:ap.user.username }}</div>
+                  </td>
+                  <td>{{ ap.adresse_ip }}</td>
+                  <td><span class="admin-date">{{ ap.derniere_connexion_le|date:"d/m/Y à H:i" }}</span></td>
+                  <td>
+                    {% if ap.est_actif %}
+                      <span style="color:#16a34a; font-weight:600;">Actif</span>
+                    {% else %}
+                      <span class="text-muted">Expiré</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-right">
+                    <div class="admin-actions">
+                      <form method="post" action="{% url 'admin_appareil_supprimer' ap.pk %}" class="form-delete-item" data-item-title="l'appareil {{ ap.appareil_lisible }} ({{ ap.adresse_ip }})" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action btn-action--delete">Révoquer</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="admin-empty-state">
+          <p>Aucun appareil enregistré. Le premier appareil sera ajouté automatiquement après une validation par code e-mail.</p>
+        </div>
+      {% endif %}
+    </div>
+
     <!-- Section Messages du formulaire de contact -->
     {% if messages_recus %}
       <div class="admin-panel admin-panel--secondary">

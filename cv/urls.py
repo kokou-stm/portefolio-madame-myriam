@@ -32,5 +32,7 @@ urlpatterns = [
     # Gestion des e-mails autorisés (Whitelist 2FA)
     path("espace-admin/email-autorise/ajouter/", views.admin_email_autorise_creer, name="admin_email_autorise_creer"),
     path("espace-admin/email-autorise/supprimer/<int:pk>/", views.admin_email_autorise_supprimer, name="admin_email_autorise_supprimer"),
+    # Appareils de confiance (validés par code e-mail)
+    path("espace-admin/appareil/supprimer/<int:pk>/", views.admin_appareil_supprimer, name="admin_appareil_supprimer"),
 ]
 
